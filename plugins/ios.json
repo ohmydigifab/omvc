@@ -1,0 +1,82 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Console\"><param name=\"ios-package\" value=\"CDVLogger\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Device\"><param name=\"ios-package\" value=\"CDVDevice\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Accelerometer\"><param name=\"ios-package\" value=\"CDVAccelerometer\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Compass\"><param name=\"ios-package\" value=\"CDVCompass\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Gamepad\"><param name=\"ios-package\" value=\"CordovaPluginGamepad\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "framework": {
+                "parents": {
+                    "CoreMotion.framework": [
+                        {
+                            "xml": false,
+                            "count": 1
+                        }
+                    ],
+                    "CoreLocation.framework": [
+                        {
+                            "xml": false,
+                            "count": 1
+                        }
+                    ],
+                    "GameController.framework": [
+                        {
+                            "xml": true,
+                            "count": 1
+                        }
+                    ],
+                    "QuartzCore.framework": [
+                        {
+                            "xml": true,
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "org.apache.cordova.console": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "org.apache.cordova.device": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "org.apache.cordova.device-motion": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "org.apache.cordova.device-orientation": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "com.judax.cordova.plugin.gamepad": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        }
+    },
+    "dependent_plugins": {}
+}
