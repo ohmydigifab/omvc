@@ -37,54 +37,82 @@ var app = {
 	// function, we must explicitly call 'app.receivedEvent(...);'
 	onDeviceReady : function() {
 		app.receivedEvent('deviceready');
-//		socket = io.connect('http://192.168.254.1:8080');
-//		socket.on('connect', function() {
-//			console.log('connect!!');
-//		});
+		// socket = io.connect('http://192.168.254.1:8080');
+		// socket.on('connect', function() {
+		// console.log('connect!!');
+		// });
 		var options = {
-			frequency : 100
-		}; // Update every 0.1 seconds
-		var watchID_accel = navigator.accelerometer.watchAcceleration(app.onSuccess_accel, app.onError_accel, options);
-		var watchID_compass = navigator.compass.watchHeading(app.onSuccess_compass, app.onError_compass, options);
+			frequency : 1000 / 60
+		}; // 60fps
+		// var watchID_accel =
+		// navigator.accelerometer.watchAcceleration(app.onSuccess_accel,
+		// app.onError_accel, options);
+		// var watchID_compass =
+		// navigator.compass.watchHeading(app.onSuccess_compass,
+		// app.onError_compass, options);
+
+		var watchID_attitude = navigator.devicemotion.watchAttitude(app.onSuccess_attitude, app.onError_attitude, options);
 	},
+	
+	onSuccess_attitude : function(attitude) {
+		myAttitude = {
+			Roll : attitude.alpha,
+			Pitch : attitude.beta,
+			Yaw : attitude.gamma,
+			Timestamp : attitude.timestamp
+        };
+        if(myAttitude_init == null)
+        {
+            myAttitude_init = myAttitude;
+        }
+        else
+        {
+            myAttitude.Yaw -= myAttitude_init.Yaw;
+        }
+
+		//console.log(myAttitude);
+	},
+
+	onError_attitude : function(error) {
+		alert('Sensor error: ' + error);
+	},
+
 	onSuccess_accel : function(acceleration) {
-//		console.log('Acceleration X: ' + acceleration.x + '\n' +
-//		 'Acceleration Y: ' + acceleration.y + '\n' + 'Acceleration Z: ' +
-//		 acceleration.z + '\n' + 'Timestamp: ' + acceleration.timestamp
-//		 + '\n');
+		// console.log('Acceleration X: ' + acceleration.x + '\n' +
+		// 'Acceleration Y: ' + acceleration.y + '\n' + 'Acceleration Z: ' +
+		// acceleration.z + '\n' + 'Timestamp: ' + acceleration.timestamp
+		// + '\n');
 		lat = Math.round(Math.atan2(-acceleration.z, -acceleration.x) * 180 / Math.PI);
-		if(lat < -90)
-		{
+		if (lat < -90) {
 			lat = -180 - lat;
 		}
-		if(lat > 90)
-		{
+		if (lat > 90) {
 			lat = 180 - lat;
 		}
-		//console.log(lat);
-		//set_lon(theta);
-//		if (theta != tilt) {
-//			tilt = theta;
-//			socket.emit('tilt_update', tilt / 90);
-//		}
+		// console.log(lat);
+		// set_lon(theta);
+		// if (theta != tilt) {
+		// tilt = theta;
+		// socket.emit('tilt_update', tilt / 90);
+		// }
 	},
 
 	onError_accel : function() {
 		console.log('onError!');
 	},
 
-    // onSuccess: Get the current heading
-    //
-    onSuccess_compass : function(heading) {
-    	//console.log('Heading: ' + heading.magneticHeading);
+	// onSuccess: Get the current heading
+	//
+	onSuccess_compass : function(heading) {
+		// console.log('Heading: ' + heading.magneticHeading);
 		lon = heading.magneticHeading;
-    },
+	},
 
-    // onError: Failed to get the heading
-    //
-    onError_compass : function(compassError) {
-        alert('Compass Error: ' + compassError.code);
-    },
+	// onError: Failed to get the heading
+	//
+	onError_compass : function(compassError) {
+		alert('Compass Error: ' + compassError.code);
+	},
 
 	// Update DOM on a Received Event
 	receivedEvent : function(id) {

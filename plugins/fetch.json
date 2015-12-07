@@ -28,5 +28,12 @@
             "type": "registry",
             "id": "com.judax.cordova.plugin.gamepad"
         }
+    },
+    "com.idoctum.deviceattitude": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/bdi/com-idoctum-deviceattitude.git",
+            "subdir": "."
+        }
     }
 }

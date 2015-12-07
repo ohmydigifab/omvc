@@ -27,6 +27,10 @@
                         {
                             "xml": "<feature name=\"Gamepad\"><param name=\"ios-package\" value=\"CordovaPluginGamepad\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"DeviceMotion\"><param name=\"ios-package\" value=\"CDVMotion\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -36,7 +40,7 @@
                     "CoreMotion.framework": [
                         {
                             "xml": false,
-                            "count": 1
+                            "count": 2
                         }
                     ],
                     "CoreLocation.framework": [
@@ -75,6 +79,9 @@
             "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
         },
         "com.judax.cordova.plugin.gamepad": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "com.idoctum.deviceattitude": {
             "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
         }
     },
