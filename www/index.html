@@ -86,41 +86,38 @@
 		debugMsgElement.appendChild(debugMsgNode);
 
 		var socket = io.connect('http://192.168.42.1:9001');
-        
-        var myAttitude_init = null;
-        var vehicleAttitude_init = null;
-        
+
+		var myAttitude_init = null;
+		var vehicleAttitude_init = null;
+
 		var myAttitude = {
 			Roll : 0,
 			Pitch : 0,
 			Yaw : 0
 		};
-		
+
 		var vehicleAttitude = {
-				Roll : 0,
-				Pitch : 0,
-				Yaw : 0
-			};
+			Roll : 0,
+			Pitch : 0,
+			Yaw : 0
+		};
 
 		//サーバから受け取るイベント
 		socket.on('connect', function() {
 			setInterval(function() {
 				var _starttime = new Date();
-				console.log('ping!!');
+				//console.log('ping!!');
 				socket.emit('ping', _starttime);
 			}, 500);
 			setInterval(function() {
 				socket.emit('getAttitude', function(obj) {
 					//console.log(obj);
 					vehicleAttitude = obj;
-                    if(vehicleAttitude_init == null)
-                    {
-                            vehicleAttitude_init = obj;
-                    }
-                    else
-                    {
-                            vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
-                    }
+					if (vehicleAttitude_init == null) {
+						vehicleAttitude_init = obj;
+					} else {
+						vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
+					}
 					debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
 					debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
 					//debug_msg += "<br/>" + attitude.q1.toFixed(2) + "," + attitude.q2.toFixed(2) + "," + attitude.q3.toFixed(2) + "," + attitude.q4.toFixed(2);
@@ -128,7 +125,7 @@
 			}, 500);
 		});
 		socket.on('pong', function() {
-			console.log('pong!!');
+			//console.log('pong!!');
 		});
 		socket.on('msg', function(msg) {
 			console.log('msg:' + msg);
@@ -224,8 +221,8 @@
 		var texture;
 		var canvas;
 		var context;
-        var effect;
-        var mesh;
+		var effect;
+		var mesh;
 
 		var isUserInteracting = false, onMouseDownMouseX = 0, onMouseDownMouseY = 0, lon = 0, onMouseDownLon = 0, lat = 0, onMouseDownLat = 0, phi = 0, theta = 0;
 
@@ -242,9 +239,10 @@
 			container = document.getElementById('container');
 
 			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
-            camera.target = new THREE.Vector3(0, 0, -1);
-            camera.up = new THREE.Vector3(0, 1, 0);
-            camera.lookAt(camera.target);
+			camera.position = new THREE.Vector3(0, 0, 0);
+			camera.target = new THREE.Vector3(0, 0, -1);
+			camera.up = new THREE.Vector3(0, 1, 0);
+			camera.lookAt(camera.target);
 
 			scene = new THREE.Scene();
 
@@ -317,7 +315,7 @@
 					texture.needsUpdate = true;
 					loading_slave = false;
 				}
-				piImage_slave.src = "http://192.168.42.15:9000/?action=snapshot";
+				piImage_slave.src = "http://192.168.42.17:9000/?action=snapshot";
 				setTimeout(function() {
 					if (!piImage_slave.complete || !piImage_slave.naturalWidth) {
 						console.log('timeout slave');
@@ -336,17 +334,47 @@
 		}
 
 		function update() {
-            mesh.rotation.order = "ZXY";
-            mesh.rotation.x = THREE.Math.degToRad(vehicleAttitude.Roll);
-            mesh.rotation.y = THREE.Math.degToRad(-vehicleAttitude.Pitch);
-            mesh.rotation.z = THREE.Math.degToRad(-vehicleAttitude.Yaw+180);
-            
-            camera.rotation.order = "ZXY";
-            camera.rotation.x = THREE.Math.degToRad(myAttitude.Roll);
-            camera.rotation.y = THREE.Math.degToRad(myAttitude.Pitch);
-            camera.rotation.z = THREE.Math.degToRad(myAttitude.Yaw);
-            
-            /*
+			var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math.degToRad(-vehicleAttitude.Yaw + 180));
+			vehicleAttitude_euler.order = "ZYX";
+
+			var target = new THREE.Vector3(0, 0, 1);
+			mesh.up = new THREE.Vector3(0, 1, 0);
+
+			var quat1 = new THREE.Quaternion();
+			quat1.setFromEuler(vehicleAttitude_euler);
+
+			target.applyQuaternion(quat1);
+			mesh.up.applyQuaternion(quat1);
+
+			mesh.lookAt(target);
+
+			var myAttitude_euler = new THREE.Euler(THREE.Math.degToRad(myAttitude.Roll), THREE.Math.degToRad(-myAttitude.Pitch), THREE.Math.degToRad(myAttitude.Yaw));
+			myAttitude_euler.order = "ZYX";
+
+			var quat2 = new THREE.Quaternion();
+			quat2.setFromEuler(myAttitude_euler);
+
+			camera.target = new THREE.Vector3(0, 0, -1);
+			camera.up = new THREE.Vector3(0, 1, 0);
+
+			camera.target.applyQuaternion(quat2);
+			camera.up.applyQuaternion(quat2);
+
+			console.log(camera.up);
+
+			camera.lookAt(camera.target);
+
+			//mesh.rotation.order = "ZYX";
+			//mesh.rotation.x = THREE.Math.degToRad(vehicleAttitude.Roll);
+			//mesh.rotation.y = THREE.Math.degToRad(-vehicleAttitude.Pitch);
+			//mesh.rotation.z = THREE.Math.degToRad(-vehicleAttitude.Yaw+180);
+
+			//camera.rotation.order = "ZYX";
+			//camera.rotation.x = THREE.Math.degToRad(myAttitude.Roll);
+			//camera.rotation.y = THREE.Math.degToRad(-myAttitude.Pitch);
+			//camera.rotation.z = THREE.Math.degToRad(myAttitude.Yaw);
+
+			/*
 			// distortion
 			camera.position.copy( camera.target ).negate();
 			 */
