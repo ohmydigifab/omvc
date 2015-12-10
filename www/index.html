@@ -89,8 +89,9 @@
 		throttleElement.appendChild(throttleNode);
 		debugMsgElement.appendChild(debugMsgNode);
 
+		var socket = null;
 		jQuery.getScript("http://192.168.42.1:9001/socket.io/socket.io.js", function() {
-			var socket = io.connect('http://192.168.42.1:9001');
+			socket = io.connect('http://192.168.42.1:9001');
 			//サーバから受け取るイベント
 			socket.on('connect', function() {
 				setInterval(function() {
@@ -160,7 +161,7 @@
 				var vs = data.fisheyeShader.vertex;
 				var fs = data.fisheyeShader.fragment;
 
-				var createMesh = function(flipY) {
+				var createMesh = function(flipX, flipY) {
 					var geometry = new THREE.SphereGeometry(500, 100, 100, 0, Math.PI);
 					geometry.scale(1, 1, 1);
 
@@ -170,6 +171,10 @@
 						vertexShader : vs,
 						fragmentShader : fs,
 						uniforms : {
+							flipX : {
+								type : 'i',
+								value : flipX
+							},
 							flipY : {
 								type : 'i',
 								value : flipY
@@ -188,9 +193,9 @@
 					material.needsUpdate = true;
 					return new THREE.Mesh(geometry, material);
 				}
-				mesh = createMesh(false);
+				mesh = createMesh(true, false);
 				scene.add(mesh);
-				mesh2 = createMesh(true);
+				mesh2 = createMesh(false, true);
 				scene.add(mesh2);
 			});
 
@@ -225,9 +230,23 @@
 					var texLoader = new THREE.TextureLoader();
 					var texture = texLoader.load("http://192.168.42.1:9000/?action=snapshot", function(tex) {
 						console.log('Drawing image');
+						var old = mesh.material.uniforms.texture.value;
 						mesh.material.uniforms.texture.value = tex;
 						mesh.material.needsUpdate = true;
+						old.dispose();
 						loading = false;
+					});
+					socket.emit('getAttitude', function(obj) {
+						//console.log(obj);
+						vehicleAttitude = obj;
+						if (vehicleAttitude_init == null) {
+							vehicleAttitude_init = obj;
+						} else {
+							vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
+						}
+						debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
+						debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
+						//debug_msg += "<br/>" + attitude.q1.toFixed(2) + "," + attitude.q2.toFixed(2) + "," + attitude.q3.toFixed(2) + "," + attitude.q4.toFixed(2);
 					});
 				}
 				if (loading2 == false) {
@@ -235,8 +254,10 @@
 					var texLoader = new THREE.TextureLoader();
 					var texture = texLoader.load("http://192.168.42.17:9000/?action=snapshot", function(tex) {
 						console.log('Drawing image2');
+						var old = mesh2.material.uniforms.texture.value;
 						mesh2.material.uniforms.texture.value = tex;
 						mesh2.material.needsUpdate = true;
+						old.dispose();
 						loading2 = false;
 					});
 				}
@@ -253,8 +274,13 @@
 
 		function update() {
 			if (mesh) {
+				var euler_correct = new THREE.Euler(THREE.Math.degToRad(0), THREE.Math.degToRad(0), THREE.Math.degToRad(0));
+				euler_correct.order = "ZYX";
+				var quat_correct = new THREE.Quaternion();
+				quat_correct.setFromEuler(euler_correct);
+				
 				{
-					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll + 90), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
 							.degToRad(-vehicleAttitude.Yaw + 180));
 					vehicleAttitude_euler.order = "ZYX";
 
@@ -263,6 +289,7 @@
 
 					var quat1 = new THREE.Quaternion();
 					quat1.setFromEuler(vehicleAttitude_euler);
+					quat1.multiply(quat_correct);
 
 					target.applyQuaternion(quat1);
 					mesh.up.applyQuaternion(quat1);
@@ -270,7 +297,7 @@
 					mesh.lookAt(target);
 				}
 				{
-					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll + 180 + 90), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll + 180), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
 							.degToRad(-vehicleAttitude.Yaw + 180));
 					vehicleAttitude_euler.order = "ZYX";
 
@@ -279,6 +306,7 @@
 
 					var quat1 = new THREE.Quaternion();
 					quat1.setFromEuler(vehicleAttitude_euler);
+					quat1.multiply(quat_correct);
 
 					target.applyQuaternion(quat1);
 					mesh2.up.applyQuaternion(quat1);
