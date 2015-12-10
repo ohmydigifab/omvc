@@ -160,7 +160,7 @@
 				var vs = data.fisheyeShader.vertex;
 				var fs = data.fisheyeShader.fragment;
 
-				var createMesh = function() {
+				var createMesh = function(flipY) {
 					var geometry = new THREE.SphereGeometry(500, 100, 100, 0, Math.PI);
 					geometry.scale(1, 1, 1);
 
@@ -170,6 +170,10 @@
 						vertexShader : vs,
 						fragmentShader : fs,
 						uniforms : {
+							flipY : {
+								type : 'i',
+								value : flipY
+							},
 							texture : {
 								type : 't',
 								value : texture
@@ -184,9 +188,9 @@
 					material.needsUpdate = true;
 					return new THREE.Mesh(geometry, material);
 				}
-				mesh = createMesh();
+				mesh = createMesh(false);
 				scene.add(mesh);
-				mesh2 = createMesh();
+				mesh2 = createMesh(true);
 				scene.add(mesh2);
 			});
 
@@ -250,7 +254,8 @@
 		function update() {
 			if (mesh) {
 				{
-					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math.degToRad(-vehicleAttitude.Yaw + 180));
+					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll + 90), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+							.degToRad(-vehicleAttitude.Yaw + 180));
 					vehicleAttitude_euler.order = "ZYX";
 
 					var target = new THREE.Vector3(0, 0, 1);
@@ -265,7 +270,7 @@
 					mesh.lookAt(target);
 				}
 				{
-					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll + 180), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll + 180 + 90), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
 							.degToRad(-vehicleAttitude.Yaw + 180));
 					vehicleAttitude_euler.order = "ZYX";
 
