@@ -10,14 +10,13 @@ void main(void){
     float pitch = atan(vTexCoord.y, vTexCoord.x);
     float n = length(vTexCoord.xy);
     float roll = atan(n, vTexCoord.z);
-    float r = 1.05 * roll / PI;
+    float r = 1.33 * roll / PI;
     float u = r * cos(pitch) + 0.5;
     float v = r * sin(pitch) + 0.5;
-    if(r > 0.5){
-	    gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0);
+    if(r > 0.60 || u < 0.0 || u > 1.0 || v < 0.0 || v > 1.0){
+	    gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);
     }
-    else
-    {
+    else{
 	    if(flipX){
 	    	u = 1.0 - u;
 	    }
