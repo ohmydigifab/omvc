@@ -230,7 +230,7 @@
 					loading2 = true;
 					var texLoader = new THREE.TextureLoader();
 					var texture = texLoader.load("http://192.168.42.17:9000/?action=snapshot", function(tex) {
-						console.log('Drawing image');
+						console.log('Drawing image2');
 						mesh2.material.uniforms.texture.value = tex;
 						mesh2.material.needsUpdate = true;
 						loading2 = false;
