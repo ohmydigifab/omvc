@@ -236,6 +236,12 @@
 						old.dispose();
 						loading = false;
 					});
+					setTimeout(function() {
+						if (!texture.image.complete || !texture.image.naturalWidth) {
+							console.log('timeout');
+							loading = false;
+						}
+					}, 5000);
 					socket.emit('getAttitude', function(obj) {
 						//console.log(obj);
 						vehicleAttitude = obj;
@@ -260,6 +266,12 @@
 						old.dispose();
 						loading2 = false;
 					});
+					setTimeout(function() {
+						if (!texture.image.complete || !texture.image.naturalWidth) {
+							console.log('timeout2');
+							loading2 = false;
+						}
+					}, 5000);
 				}
 			}
 			{//status
@@ -278,10 +290,9 @@
 				euler_correct.order = "ZYX";
 				var quat_correct = new THREE.Quaternion();
 				quat_correct.setFromEuler(euler_correct);
-				
+
 				{
-					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
-							.degToRad(-vehicleAttitude.Yaw + 180));
+					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math.degToRad(-vehicleAttitude.Yaw + 180));
 					vehicleAttitude_euler.order = "ZYX";
 
 					var target = new THREE.Vector3(0, 0, 1);
