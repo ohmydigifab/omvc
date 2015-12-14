@@ -55,6 +55,10 @@
 	</div>
 	</ons-toolbar> <ons-list class="menu-list"> <ons-list-item class="menu-item">
 	</ons-list-item> <ons-list-item class="menu-item">
+	 <ons-row align="center"> <ons-col>InfoBox</ons-col> <ons-col align="right">
+	 <ons-switch var="swInfoBox" onchange="omvc.set_infobox_enabled(swInfoBox.isChecked());"></ons-switch>
+	 </ons-col>
+	</ons-row> 
 	 <ons-row align="center"> <ons-col>Stereo</ons-col> <ons-col align="right">
 	 <ons-switch var="swStereoView" onchange="omvc.omvr.set_stero_enabled(swStereoView.isChecked());"></ons-switch>
 	 </ons-col>

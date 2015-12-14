@@ -1,21 +1,9 @@
-var throttle = 0;
-var debug_msg = "";
-
-// look up the elements we want to affect
-var throttleElement = document.getElementById("throttle");
-var debugMsgElement = document.getElementById("debug_msg");
-
-// Create text nodes to save some time for the browser.
-var throttleNode = document.createTextNode("");
-var debugMsgNode = document.createTextNode("");
-
-// Add those text nodes where they need to go
-throttleElement.appendChild(throttleNode);
-debugMsgElement.appendChild(debugMsgNode);
-
 var socket = null;
 var omvc = OMVC();
 function OMVC() {
+	var throttle = 0;
+	var debug_msg = "";
+
 	var myAttitude_init = null;
 	var vehicleAttitude_init = null;
 
@@ -31,17 +19,24 @@ function OMVC() {
 		Yaw : 0
 	};
 
+	var overlayElement = document.getElementById("overlay");
+	overlayElement.hidden = true;
+	
+	var throttleNode = document.createTextNode("");
+	var debugMsgNode = document.createTextNode("");
+
 	var myself = {
+		set_infobox_enabled : function(value) {
+			var overlayElement = document.getElementById("overlay");
+			overlayElement.hidden = !value;
+		},
 		set_myAttitude : function(value) {
 			myAttitude = value;
-	        if(myAttitude_init == null)
-	        {
-	            myAttitude_init = value;
-	        }
-	        else
-	        {
-	            myAttitude.Yaw -= myAttitude_init.Yaw;
-	        }
+			if (myAttitude_init == null) {
+				myAttitude_init = value;
+			} else {
+				myAttitude.Yaw -= myAttitude_init.Yaw;
+			}
 			myself.omvr.set_myAttitude(myAttitude);
 		},
 		set_vehicleAttitude : function(value) {
@@ -55,6 +50,14 @@ function OMVC() {
 		},
 		omvr : new OMVR(),
 		init : function() {
+			// look up the elements we want to affect
+			var throttleElement = document.getElementById("throttle");
+			var debugMsgElement = document.getElementById("debug_msg");
+
+			// Add those text nodes where they need to go
+			throttleElement.appendChild(throttleNode);
+			debugMsgElement.appendChild(debugMsgNode);
+			
 			jQuery.getScript("http://192.168.42.1:9001/socket.io/socket.io.js", function() {
 				socket = io.connect('http://192.168.42.1:9001');
 				// サーバから受け取るイベント
