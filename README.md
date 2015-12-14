@@ -1,2 +1,2 @@
 # omvc
-a oh-my-vehicle Cockpit
+a oh-my-vehicle cockpit
