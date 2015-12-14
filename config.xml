@@ -1,10 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ohmydigifab.openrovcardboardviewer" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>openrov-cardboard-viewer</name>
-    <description>
-        A sample Apache Cordova application that responds to the deviceready event.
-    </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
+<widget id="com.ohmydigifab.omvc" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>OMVCockpit</name>
+    <description>a oh-my-vehicle Cockpit</description>
+    <author email="hirayama.takuma@ohmydigifab.com" href="http://www.ohmydigifab.com">
         Apache Cordova Team
     </author>
     <content src="index.html" />

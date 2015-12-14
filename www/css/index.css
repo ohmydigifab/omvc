@@ -19,7 +19,10 @@
 * {
     -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
 }
-
+html {
+    overflow: hidden;
+    height:100%;
+}
 body {
     -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
@@ -37,7 +40,7 @@ body {
     overflow: hidden;
 }
 
-.app {
+.main_view {
     position:absolute;             /* position in the center of the screen */
     left:0%;
     top:0%;

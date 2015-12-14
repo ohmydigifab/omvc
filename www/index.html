@@ -17,51 +17,103 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<html>
+<html ng-app="app">
 <head>
-<meta charset="utf-8" />
-<meta name="format-detection" content="telephone=no" />
-<meta name="msapplication-tap-highlight" content="no" />
-<!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-height, height=device-width, target-densitydpi=device-dpi" />
-<link rel="stylesheet" type="text/css" href="css/index.css" />
-<title>Hello World</title>
-<script type="text/javascript">
-	// スクロールを抑止する関数
-	function preventScroll(event) {
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
 
-		// li要素だけは、タップイベントに反応したいので、抑止しない。
-		if (event.touches[0].target.tagName.toLowerCase() == "li") {
-			return;
-		}
-
-		// preventDefaultでブラウザ標準動作を抑止する。
-		event.preventDefault();
-	}
-
-	// タッチイベントの初期化
-	document.addEventListener("touchstart", preventScroll, false);
-	document.addEventListener("touchmove", preventScroll, false);
-	document.addEventListener("touchend", preventScroll, false);
-	// ジェスチャーイベントの初期化
-	document.addEventListener("gesturestart", preventScroll, false);
-	document.addEventListener("gesturechange", preventScroll, false);
-	document.addEventListener("gestureend", preventScroll, false);
-</script>
-</head>
-<body ontouchmove="event.preventDefault()">
-	<script data-src="glsl/fisheye.vert" data-name="fisheyeShader" type="x-shader/x-vertex"></script>
-	<script data-src="glsl/fisheye.frag" data-name="fisheyeShader" type="x-shader/x-fragment"></script>
-	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
-	<script type="text/javascript" src="js/ShaderLoader.min.js"></script>
-	<script type="text/javascript" src="cordova.js"></script>
-	<script type="text/javascript" src="Gamepad.js"></script>
+    <!-- JS dependencies (order matters!) -->
+    <script src="lib/angular/angular.js"></script>
+    <script src="lib/onsen/js/onsenui.js"></script>
+    <script src="js/jquery-1.11.3.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="js/three.min.js"></script>
 	<script type="text/javascript" src="js/StereoEffect.js"></script>
-	<script type="text/javascript" src="js/index.js"></script>
-	<script type="text/javascript" src="js/gamepad.js"></script>
+	<script type="text/javascript" src="cordova.js"></script>
+	<script type="text/javascript" src="Gamepad.js"></script>
 
-	<div class="app" id="container">
+    <!-- CSS dependencies -->
+    <link rel="stylesheet" href="lib/onsen/css/onsenui.css" />
+    <link rel="stylesheet" href="lib/onsen/css/onsen-css-components-dark-theme.css" />
+    <link rel="stylesheet" href="css/index.css" />
+
+    <!-- CSP support mode (required for Windows Universal apps) -->
+    <link rel="stylesheet" href="lib/angular/angular-csp.css" />
+
+
+    <!-- --------------- App init --------------- -->
+
+    <title>OMVCockpit</title>
+
+    <script>
+        angular.module('app', ['onsen']);
+    </script>
+
+    <style>
+        .page--menu-page__background {
+            background-color: #333;
+        }
+
+        .page--menu-page__content {
+            color: white;
+        }
+
+        .menu-close,
+        .menu-close > .toolbar-button {
+            color: #999;
+        }
+
+        .menu-list,
+        .menu-item:first-child,
+        .menu-item:last-child,
+        .menu-item {
+            background-color: transparent;
+            background-image: none !important;
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .menu-item {
+            padding: 0 0 0 20px;
+            line-height: 52px;
+            height: 52px;
+            text-shadow: rgba(0, 0, 0, 0.4) 0px 1px 0px;
+        }
+
+            .menu-item:active {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+        .menu-notification {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 14px;
+            height: 16px;
+            line-height: 16px;
+            min-width: 16px;
+            font-weight: 600;
+        }
+
+        .bottom-menu-list,
+        .bottom-menu-item:first-child,
+        .bottom-menu-item:last-child,
+        .bottom-menu-item {
+            border-color: #393939;
+            background-color: transparent;
+            background-image: none !important;
+            color: #ccc;
+        }
+
+            .bottom-menu-item:active {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+    </style>
+
+</head>
+<body ontouchmove="event.preventDefault()">
+	
+	<div class="main_view" id="container">
 		<div id="overlay">
 			<div>
 				Throttle: <span id="throttle"></span>
@@ -71,295 +123,11 @@
 			</div>
 		</div>
 	</div>
-	<canvas id="tempCanvas"></canvas>
 
-	<script>
-		var throttle = 0;
-		var debug_msg = "";
+	<script type="text/javascript" src="js/index.js"></script>
+	<script type="text/javascript" src="js/gamepad.js"></script>
+	<script type="text/javascript" src="js/omvr.js"></script>
+	<script type="text/javascript" src="js/omvc.js"></script>
 
-		// look up the elements we want to affect
-		var throttleElement = document.getElementById("throttle");
-		var debugMsgElement = document.getElementById("debug_msg");
-
-		// Create text nodes to save some time for the browser.
-		var throttleNode = document.createTextNode("");
-		var debugMsgNode = document.createTextNode("");
-
-		// Add those text nodes where they need to go
-		throttleElement.appendChild(throttleNode);
-		debugMsgElement.appendChild(debugMsgNode);
-
-		var socket = null;
-		jQuery.getScript("http://192.168.42.1:9001/socket.io/socket.io.js", function() {
-			socket = io.connect('http://192.168.42.1:9001');
-			//サーバから受け取るイベント
-			socket.on('connect', function() {
-				setInterval(function() {
-					var _starttime = new Date();
-					//console.log('ping!!');
-					socket.emit('ping', _starttime);
-				}, 500);
-			});
-			socket.on('pong', function() {
-				//console.log('pong!!');
-			});
-			socket.on('msg', function(msg) {
-				console.log('msg:' + msg);
-				debug_msg = msg;
-			});
-			socket.on("disconnect", function(client) {
-			});
-		});
-
-		var myAttitude_init = null;
-		var vehicleAttitude_init = null;
-
-		var myAttitude = {
-			Roll : 0,
-			Pitch : 0,
-			Yaw : 0
-		};
-
-		var vehicleAttitude = {
-			Roll : 0,
-			Pitch : 0,
-			Yaw : 0
-		};
-
-		var camera, scene, renderer;
-
-		var texture;
-		var canvas;
-		var context;
-		var effect;
-		var mesh;
-		var mesh2;
-
-		var isUserInteracting = false, onMouseDownMouseX = 0, onMouseDownMouseY = 0, lon = 0, onMouseDownLon = 0, lat = 0, onMouseDownLat = 0, phi = 0, theta = 0;
-
-		function set_lon(value) {
-			lon = value;
-		}
-
-		init();
-		animate();
-
-		function init() {
-			var container;
-
-			container = document.getElementById('container');
-
-			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
-			camera.position = new THREE.Vector3(0, 0, 0);
-			camera.target = new THREE.Vector3(0, 0, -1);
-			camera.up = new THREE.Vector3(0, 1, 0);
-			camera.lookAt(camera.target);
-
-			scene = new THREE.Scene();
-
-			SHADER_LOADER.load(function(data) {
-				var vs = data.fisheyeShader.vertex;
-				var fs = data.fisheyeShader.fragment;
-
-				var createMesh = function(flipX, flipY) {
-					var geometry = new THREE.SphereGeometry(500, 100, 100, 0, Math.PI);
-					geometry.scale(1, 1, 1);
-
-					var texLoader = new THREE.TextureLoader();
-					var texture = texLoader.load('img/fisheye.jpeg');
-					var material = new THREE.ShaderMaterial({
-						vertexShader : vs,
-						fragmentShader : fs,
-						uniforms : {
-							flipX : {
-								type : 'i',
-								value : flipX
-							},
-							flipY : {
-								type : 'i',
-								value : flipY
-							},
-							texture : {
-								type : 't',
-								value : texture
-							}
-						},
-						side : THREE.DoubleSide,
-						// 通常マテリアルのパラメータ
-						blending : THREE.AdditiveBlending,
-						transparent : true,
-						depthTest : false
-					});
-					material.needsUpdate = true;
-					return new THREE.Mesh(geometry, material);
-				}
-				mesh = createMesh(true, false);
-				scene.add(mesh);
-				mesh2 = createMesh(false, true);
-				scene.add(mesh2);
-			});
-
-			renderer = new THREE.WebGLRenderer({
-				antialias : true
-			});
-			renderer.setPixelRatio(window.devicePixelRatio);
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			container.appendChild(renderer.domElement);
-
-			effect = new THREE.StereoEffect(renderer);
-			effect.setSize(window.innerWidth, window.innerHeight);
-
-			window.addEventListener('resize', onWindowResize, false);
-		}
-
-		function onWindowResize() {
-
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			effect.setSize(window.innerWidth, window.innerHeight);
-		}
-
-		var loading = false;
-		var loading2 = false;
-		function animate() {
-			if (mesh) {
-				if (loading == false) {
-					loading = true;
-					var texLoader = new THREE.TextureLoader();
-					var texture = texLoader.load("http://192.168.42.1:9000/?action=snapshot", function(tex) {
-						console.log('Drawing image');
-						var old = mesh.material.uniforms.texture.value;
-						mesh.material.uniforms.texture.value = tex;
-						mesh.material.needsUpdate = true;
-						old.dispose();
-						loading = false;
-					});
-					setTimeout(function() {
-						if (!texture.image.complete || !texture.image.naturalWidth) {
-							console.log('timeout');
-							loading = false;
-						}
-					}, 5000);
-					socket.emit('getAttitude', function(obj) {
-						//console.log(obj);
-						vehicleAttitude = obj;
-						if (vehicleAttitude_init == null) {
-							vehicleAttitude_init = obj;
-						} else {
-							vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
-						}
-						debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
-						debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
-						//debug_msg += "<br/>" + attitude.q1.toFixed(2) + "," + attitude.q2.toFixed(2) + "," + attitude.q3.toFixed(2) + "," + attitude.q4.toFixed(2);
-					});
-				}
-				if (loading2 == false) {
-					loading2 = true;
-					var texLoader = new THREE.TextureLoader();
-					var texture = texLoader.load("http://192.168.42.17:9000/?action=snapshot", function(tex) {
-						console.log('Drawing image2');
-						var old = mesh2.material.uniforms.texture.value;
-						mesh2.material.uniforms.texture.value = tex;
-						mesh2.material.needsUpdate = true;
-						old.dispose();
-						loading2 = false;
-					});
-					setTimeout(function() {
-						if (!texture.image.complete || !texture.image.naturalWidth) {
-							console.log('timeout2');
-							loading2 = false;
-						}
-					}, 5000);
-				}
-			}
-			{//status
-				throttleNode.nodeValue = (throttle * 100).toFixed(0) + "%";
-				debugMsgNode.nodeValue = debug_msg;
-			}
-
-			requestAnimationFrame(animate);
-			update();
-			handleGamepad();
-		}
-
-		function update() {
-			if (mesh) {
-				var euler_correct = new THREE.Euler(THREE.Math.degToRad(0), THREE.Math.degToRad(0), THREE.Math.degToRad(0));
-				euler_correct.order = "ZYX";
-				var quat_correct = new THREE.Quaternion();
-				quat_correct.setFromEuler(euler_correct);
-
-				{
-					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math.degToRad(-vehicleAttitude.Yaw + 180));
-					vehicleAttitude_euler.order = "ZYX";
-
-					var target = new THREE.Vector3(0, 0, 1);
-					mesh.up = new THREE.Vector3(0, 1, 0);
-
-					var quat1 = new THREE.Quaternion();
-					quat1.setFromEuler(vehicleAttitude_euler);
-					quat1.multiply(quat_correct);
-
-					target.applyQuaternion(quat1);
-					mesh.up.applyQuaternion(quat1);
-
-					mesh.lookAt(target);
-				}
-				{
-					var vehicleAttitude_euler = new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll + 180), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
-							.degToRad(-vehicleAttitude.Yaw + 180));
-					vehicleAttitude_euler.order = "ZYX";
-
-					var target = new THREE.Vector3(0, 0, 1);
-					mesh2.up = new THREE.Vector3(0, 1, 0);
-
-					var quat1 = new THREE.Quaternion();
-					quat1.setFromEuler(vehicleAttitude_euler);
-					quat1.multiply(quat_correct);
-
-					target.applyQuaternion(quat1);
-					mesh2.up.applyQuaternion(quat1);
-
-					mesh2.lookAt(target);
-				}
-			}
-
-			var myAttitude_euler = new THREE.Euler(THREE.Math.degToRad(myAttitude.Roll), THREE.Math.degToRad(-myAttitude.Pitch), THREE.Math.degToRad(myAttitude.Yaw));
-			myAttitude_euler.order = "ZYX";
-
-			var quat2 = new THREE.Quaternion();
-			quat2.setFromEuler(myAttitude_euler);
-
-			camera.target = new THREE.Vector3(0, 0, -1);
-			camera.up = new THREE.Vector3(0, 1, 0);
-
-			camera.target.applyQuaternion(quat2);
-			camera.up.applyQuaternion(quat2);
-
-			//console.log(camera.up);
-
-			camera.lookAt(camera.target);
-
-			//mesh.rotation.order = "ZYX";
-			//mesh.rotation.x = THREE.Math.degToRad(vehicleAttitude.Roll);
-			//mesh.rotation.y = THREE.Math.degToRad(-vehicleAttitude.Pitch);
-			//mesh.rotation.z = THREE.Math.degToRad(-vehicleAttitude.Yaw+180);
-
-			//camera.rotation.order = "ZYX";
-			//camera.rotation.x = THREE.Math.degToRad(myAttitude.Roll);
-			//camera.rotation.y = THREE.Math.degToRad(-myAttitude.Pitch);
-			//camera.rotation.z = THREE.Math.degToRad(myAttitude.Yaw);
-
-			/*
-			// distortion
-			camera.position.copy( camera.target ).negate();
-			 */
-
-			//renderer.render( scene, camera );
-			effect.render(scene, camera);
-		}
-	</script>
 </body>
 </html>

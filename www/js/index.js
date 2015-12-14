@@ -42,8 +42,8 @@ var app = {
 		// console.log('connect!!');
 		// });
 		var options = {
-			frequency : 1000 / 60
-		}; // 60fps
+			frequency : 1000 / 100
+		}; // 100fps
 		// var watchID_accel =
 		// navigator.accelerometer.watchAcceleration(app.onSuccess_accel,
 		// app.onError_accel, options);

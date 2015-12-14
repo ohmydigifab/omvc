@@ -1,0 +1,41 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Device\"><param name=\"browser-package\" value=\"Device\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "com.idoctum.deviceattitude": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "com.judax.cordova.plugin.gamepad": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "org.apache.cordova.console": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "org.apache.cordova.device": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "org.apache.cordova.device-motion": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "org.apache.cordova.device-orientation": {
+            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        }
+    },
+    "dependent_plugins": {}
+}
