@@ -100,6 +100,8 @@ var OMVR = function() {
 
 	"" ].join("\n");
 
+	var stero_enabled = false;
+
 	return {
 		set_myAttitude : function(value) {
 			myAttitude = value;
@@ -164,7 +166,7 @@ var OMVR = function() {
 			scene = new THREE.Scene();
 
 			renderer = new THREE.WebGLRenderer({
-				canvas: canvas,
+				canvas : canvas,
 				antialias : true
 			});
 			renderer.setPixelRatio(window.devicePixelRatio);
@@ -245,7 +247,7 @@ var OMVR = function() {
 				camera.lookAt(camera.target);
 			}
 
-			if (this.stero_enabled) {
+			if (stero_enabled) {
 				effect.render(scene, camera);
 
 			} else {
@@ -253,6 +255,9 @@ var OMVR = function() {
 			}
 		},
 
-		stero_enabled : false
+		set_stero_enabled : function(value) {
+			stero_enabled = value;
+			onWindowResize();
+		}
 	}
 }

@@ -81,7 +81,6 @@ function omvc_init() {
 		Pitch : 0,
 		Yaw : 0
 	});
-	OMVR.stero_enabled = true;
 
 	animate();
 }
