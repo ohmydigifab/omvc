@@ -2,7 +2,7 @@
  * @author takumadx / http://www.ohmydigifab.com/
  */
 
-var OMVR = function() {
+function OMVR() {
 	var myAttitude = {
 		Roll : 0,
 		Pitch : 0,

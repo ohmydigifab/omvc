@@ -53,24 +53,14 @@ var app = {
 
 		var watchID_attitude = navigator.devicemotion.watchAttitude(app.onSuccess_attitude, app.onError_attitude, options);
 	},
-	
+
 	onSuccess_attitude : function(attitude) {
-		myAttitude = {
+		omvc.set_myAttitude({
 			Roll : attitude.alpha,
 			Pitch : attitude.beta,
 			Yaw : attitude.gamma,
 			Timestamp : attitude.timestamp
-        };
-        if(myAttitude_init == null)
-        {
-            myAttitude_init = myAttitude;
-        }
-        else
-        {
-            myAttitude.Yaw -= myAttitude_init.Yaw;
-        }
-
-		//console.log(myAttitude);
+		});
 	},
 
 	onError_attitude : function(error) {
