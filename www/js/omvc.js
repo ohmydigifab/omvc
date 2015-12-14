@@ -50,38 +50,42 @@ var vehicleAttitude = {
 	Yaw : 0
 };
 
-var container = document.getElementById('container');
 var OMVR = new OMVR();
-OMVR.init(container);
-OMVR.add_fisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
-	if (socket) {
-		socket.emit('getAttitude', function(obj) {
-			// console.log(obj);
-			vehicleAttitude = obj;
-			if (vehicleAttitude_init == null) {
-				vehicleAttitude_init = obj;
-			} else {
-				vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
-			}
-			OMVR.set_vehicleAttitude(vehicleAttitude);
-			debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
-			debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
-		});
-	}
-}, {
-	Roll : 0,
-	Pitch : 0,
-	Yaw : 0
-});
-OMVR.add_fisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.17:9000/?action=snapshot', false, true, function() {
-}, {
-	Roll : 180,
-	Pitch : 0,
-	Yaw : 0
-});
-OMVR.stero_enabled = true;
 
-animate();
+function omvc_init() {
+	var canvas = document.getElementById('vr_canvas');
+	OMVR.init(canvas);
+	OMVR.add_fisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
+		if (socket) {
+			socket.emit('getAttitude', function(obj) {
+				// console.log(obj);
+				vehicleAttitude = obj;
+				if (vehicleAttitude_init == null) {
+					vehicleAttitude_init = obj;
+				} else {
+					vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
+				}
+				OMVR.set_vehicleAttitude(vehicleAttitude);
+				debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
+				debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
+			});
+		}
+	}, {
+		Roll : 0,
+		Pitch : 0,
+		Yaw : 0
+	});
+	OMVR.add_fisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.17:9000/?action=snapshot', false, true, function() {
+	}, {
+		Roll : 180,
+		Pitch : 0,
+		Yaw : 0
+	});
+	OMVR.stero_enabled = true;
+
+	animate();
+}
+
 function animate() {
 	OMVR.set_myAttitude(myAttitude);
 	OMVR.animate();

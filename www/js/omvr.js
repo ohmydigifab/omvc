@@ -153,7 +153,7 @@ var OMVR = function() {
 			});
 		},
 
-		init : function(container) {
+		init : function(canvas) {
 
 			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
 			camera.position = new THREE.Vector3(0, 0, 0);
@@ -164,6 +164,7 @@ var OMVR = function() {
 			scene = new THREE.Scene();
 
 			renderer = new THREE.WebGLRenderer({
+				canvas: canvas,
 				antialias : true
 			});
 			renderer.setPixelRatio(window.devicePixelRatio);
