@@ -79,6 +79,10 @@
 	 <ons-switch var="swArm" onchange="omvc.setArm(swArm.isChecked());"></ons-switch>
 	 </ons-col>
 	</ons-row> 
+	 <ons-row align="center"> <ons-col>Connect</ons-col> <ons-col align="right">
+	 <ons-switch var="swConnect" onchange="omvc.connect(swConnect.isChecked());"></ons-switch>
+	 </ons-col>
+	</ons-row> 
 	</ons-list-item> <ons-list-item class="menu-item" ng-click="app.navi.pushPage('about.html');menu.closeMenu();"> <ons-icon icon="fa-info-circle" fixed-width="true"></ons-icon> About </ons-list-item> </ons-list> </ons-page> </ons-template>
 
 	<ons-template id="main.html"> <ons-page>

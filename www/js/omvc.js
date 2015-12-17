@@ -1,6 +1,12 @@
 var socket = null;
 var omvc = OMVC();
 function OMVC() {
+	var manualControlValue = {
+		Throttle : -1,
+		Roll : 0,
+		Pitch : 0,
+		Yaw : 0
+	};
 	var throttle = 0;
 	var debug_msg = "";
 
@@ -76,9 +82,8 @@ function OMVC() {
 				socket.on('pong', function(obj) {
 					console.log('pong!!');
 					console.log(obj);
-					if (obj.FlightStatus.Armed) {
-						console.log("Armed");
-					}
+					swConnect.setChecked(obj.FlightTelemetryStats.Status);
+					swArm.setChecked(obj.FlightStatus.Armed);
 				});
 				socket.on('msg', function(msg) {
 					console.log('msg:' + msg);
@@ -136,20 +141,25 @@ function OMVC() {
 			requestAnimationFrame(myself.animate);
 		},
 
+		connect : function(value) {
+			if (socket == null) {
+				return;
+			}
+			socket.emit('connect', function(res) {
+			});
+		},
+
 		setArm : function(value) {
 			if (socket == null) {
 				return;
 			}
-			socket.emit('setThrottle', 1000, function(res) {
-				socket.emit('setRoll', 1500, function(res) {
-					socket.emit('setPitch', 1500, function(res) {
-						socket.emit('setYaw', 1500, function(res) {
-							socket.emit('setArm', value, function(res) {
-								throttle = 0;
-							});
-						});
-					});
-				});
+			socket.emit('setArm', value, function(res) {
+				manualControlValue = {
+					Throttle : -1,
+					Roll : 0,
+					Pitch : 0,
+					Yaw : 0
+				};
 			});
 		},
 
