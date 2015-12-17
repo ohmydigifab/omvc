@@ -141,11 +141,11 @@ function OMVC() {
 			requestAnimationFrame(myself.animate);
 		},
 
-		connect : function(value) {
+		connectFcm : function(value) {
 			if (socket == null) {
 				return;
 			}
-			socket.emit('connect', function(res) {
+			socket.emit('connectFcm', function(res) {
 			});
 		},
 
