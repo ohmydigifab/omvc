@@ -1,13 +1,16 @@
 var socket = null;
 var omvc = OMVC();
 function OMVC() {
-	var manualControlValue = {
-		Throttle : -1,
+	var controlValue = {
+		// 0% - 100%
+		Throttle : 0,
+		// -180 - 180
 		Roll : 0,
+		// -180 - 180
 		Pitch : 0,
+		// -180 - 180
 		Yaw : 0
 	};
-	var throttle = 0;
 	var debug_msg = "";
 
 	var myAttitude_init = null;
@@ -29,11 +32,18 @@ function OMVC() {
 		Dive : 0,
 		Drive : 1
 	};
+	
+	window.addEventListener("orientationchange", function(){
+		alert(window.orientation);
+	});
 
 	var overlayElement = document.getElementById("overlay");
-	overlayElement.hidden = true;
+	overlayElement.style.display = "none";
+	var infoTypeBoxElement = document.getElementById("infoTypeBox");
+	infoTypeBoxElement.style.display = "none";
+	document.getElementById("debugMsgBox").style.display = "none";
 
-	var throttleNode = document.createTextNode("");
+	var controlValueNode = document.createTextNode("");
 	var debugMsgNode = document.createTextNode("");
 
 	var viewMode = ViewModeEnum.Dive;
@@ -41,7 +51,19 @@ function OMVC() {
 	var myself = {
 		set_infobox_enabled : function(value) {
 			var overlayElement = document.getElementById("overlay");
-			overlayElement.hidden = !value;
+			overlayElement.style.display = value ? "block" : "none";
+			var infoTypeBoxElement = document.getElementById("infoTypeBox");
+			infoTypeBoxElement.style.display = value ? "block" : "none";
+		},
+		setInfoType : function(type) {
+			switch (type) {
+			case "none":
+				document.getElementById("debugMsgBox").style.display = "none";
+				break;
+			case "debug":
+				document.getElementById("debugMsgBox").style.display = "block";
+				break;
+			}
 		},
 		set_myAttitude : function(value) {
 			myAttitude = value;
@@ -62,11 +84,11 @@ function OMVC() {
 		omvr : new OMVR(),
 		init : function() {
 			// look up the elements we want to affect
-			var throttleElement = document.getElementById("throttle");
+			var controlValueElement = document.getElementById("control_values");
 			var debugMsgElement = document.getElementById("debug_msg");
 
 			// Add those text nodes where they need to go
-			throttleElement.appendChild(throttleNode);
+			controlValueElement.appendChild(controlValueNode);
 			debugMsgElement.appendChild(debugMsgNode);
 
 			jQuery.getScript("http://192.168.42.1:9001/socket.io/socket.io.js", function() {
@@ -117,6 +139,29 @@ function OMVC() {
 				Yaw : 0
 			});
 
+			if (omgamepad) {
+				omgamepad.gamepadCallback = function(key, value, count) {
+					switch (key) {
+					case "button0":
+						if (count == 1) {
+							controlValue.Throttle++;
+							if (controlValue.Throttle > 100) {
+								controlValue.Throttle = 100;
+							}
+						}
+						break;
+					case "button1":
+						if (count == 1) {
+							controlValue.Throttle--;
+							if (controlValue.Throttle < 0) {
+								controlValue.Throttle = 0;
+							}
+						}
+						break;
+					}
+				}
+			}
+
 			myself.animate();
 		},
 
@@ -132,12 +177,18 @@ function OMVC() {
 					Yaw : 0
 				});
 			}
+
 			myself.omvr.animate();
+
 			{// status
-				throttleNode.nodeValue = (throttle * 100).toFixed(0) + "%";
+				controlValueNode.nodeValue = controlValue.Throttle.toFixed(0) + "%" + " " + controlValue.Roll + " " + controlValue.Pitch + " " + controlValue.Yaw;
 				debugMsgNode.nodeValue = debug_msg;
 			}
-			handleGamepad();
+
+			if (omgamepad) {
+				omgamepad.handleGamepad();
+			}
+
 			requestAnimationFrame(myself.animate);
 		},
 
@@ -154,8 +205,8 @@ function OMVC() {
 				return;
 			}
 			socket.emit('setArm', value, function(res) {
-				manualControlValue = {
-					Throttle : -1,
+				controlValue = {
+					Throttle : 0,
 					Roll : 0,
 					Pitch : 0,
 					Yaw : 0
