@@ -34,7 +34,7 @@ function OMVC() {
 	};
 	
 	window.addEventListener("orientationchange", function(){
-		alert(window.orientation);
+		//alert(window.orientation);
 	});
 
 	var overlayElement = document.getElementById("overlay");
@@ -158,6 +158,64 @@ function OMVC() {
 							}
 						}
 						break;
+					case "button2":
+						if (count == 1) {
+						}
+						break;
+					case "button3":
+						if (count == 1) {
+						}
+						break;
+					case "dpadUp":
+						if (count == 1) {
+							controlValue.Pitch++;
+							if (controlValue.Pitch > 180) {
+								controlValue.Pitch = -180;
+							}
+						}
+						break;
+					case "dpadDown":
+						if (count == 1) {
+							controlValue.Pitch--;
+							if (controlValue.Pitch < -180) {
+								controlValue.Pitch = 180;
+							}
+						}
+						break;
+					case "dpadRight":
+						if (count == 1) {
+							controlValue.Roll++;
+							if (controlValue.Roll > 180) {
+								controlValue.Roll = -180;
+							}
+						}
+						break;
+					case "dpadLeft":
+						if (count == 1) {
+							controlValue.Roll--;
+							if (controlValue.Roll < -180) {
+								controlValue.Roll = 180;
+							}
+						}
+						break;
+					case "rightBumper":
+						if (count == 1) {
+							controlValue.Yaw++;
+							if (controlValue.Yaw > 180) {
+								controlValue.Yaw = -180;
+							}
+						}
+						break;
+					case "leftBumper":
+						if (count == 1) {
+							controlValue.Yaw--;
+							if (controlValue.Yaw < -180) {
+								controlValue.Yaw = 180;
+							}
+						}
+						break;
+					default:
+						alert(key);
 					}
 				}
 			}
