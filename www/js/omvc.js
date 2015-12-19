@@ -32,9 +32,9 @@ function OMVC() {
 		Dive : 0,
 		Drive : 1
 	};
-	
-	window.addEventListener("orientationchange", function(){
-		//alert(window.orientation);
+
+	window.addEventListener("orientationchange", function() {
+		// alert(window.orientation);
 	});
 
 	var overlayElement = document.getElementById("overlay");
@@ -48,7 +48,7 @@ function OMVC() {
 
 	var viewMode = ViewModeEnum.Dive;
 
-	var myself = {
+	var self = {
 		set_infobox_enabled : function(value) {
 			var overlayElement = document.getElementById("overlay");
 			overlayElement.style.display = value ? "block" : "none";
@@ -83,6 +83,16 @@ function OMVC() {
 		},
 		omvr : new OMVR(),
 		init : function() {
+
+			self.initSocket();
+			self.initOmvr();
+			self.initGamepadEventLisener();
+			self.initMouseEventLisener();
+
+			self.animate();
+		},
+
+		initOmvr : function() {
 			// look up the elements we want to affect
 			var controlValueElement = document.getElementById("control_values");
 			var debugMsgElement = document.getElementById("debug_msg");
@@ -91,6 +101,32 @@ function OMVC() {
 			controlValueElement.appendChild(controlValueNode);
 			debugMsgElement.appendChild(debugMsgNode);
 
+			var canvas = document.getElementById('vr_canvas');
+			self.omvr.init(canvas);
+			self.omvr.add_fisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
+				if (socket == null) {
+					return;
+				}
+				socket.emit('getAttitude', function(obj) {
+					// console.log(obj);
+					self.set_vehicleAttitude(obj);
+					debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
+					debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
+				});
+			}, {
+				Roll : 0,
+				Pitch : 0,
+				Yaw : 0
+			});
+			self.omvr.add_fisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.17:9000/?action=snapshot', false, true, function() {
+			}, {
+				Roll : 180,
+				Pitch : 0,
+				Yaw : 0
+			});
+		},
+
+		initSocket : function() {
 			jQuery.getScript("http://192.168.42.1:9001/socket.io/socket.io.js", function() {
 				socket = io.connect('http://192.168.42.1:9001');
 				// サーバから受け取るイベント
@@ -114,32 +150,12 @@ function OMVC() {
 				socket.on("disconnect", function(client) {
 				});
 			})
+		},
 
-			var canvas = document.getElementById('vr_canvas');
-			myself.omvr.init(canvas);
-			myself.omvr.add_fisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
-				if (socket == null) {
-					return;
-				}
-				socket.emit('getAttitude', function(obj) {
-					// console.log(obj);
-					myself.set_vehicleAttitude(obj);
-					debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
-					debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
-				});
-			}, {
-				Roll : 0,
-				Pitch : 0,
-				Yaw : 0
-			});
-			myself.omvr.add_fisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.17:9000/?action=snapshot', false, true, function() {
-			}, {
-				Roll : 180,
-				Pitch : 0,
-				Yaw : 0
-			});
-
+		initGamepadEventLisener : function() {
 			if (omgamepad) {
+				var command_processing = false;
+				var x = 0, y = 0, z = 0;
 				omgamepad.gamepadCallback = function(key, value, count) {
 					switch (key) {
 					case "button0":
@@ -161,82 +177,127 @@ function OMVC() {
 					case "button2":
 						if (count == 1) {
 						}
+						return;
 						break;
 					case "button3":
 						if (count == 1) {
 						}
-						break;
-					case "dpadUp":
-						if (count == 1) {
-							controlValue.Pitch++;
-							if (controlValue.Pitch > 180) {
-								controlValue.Pitch = -180;
-							}
-						}
-						break;
-					case "dpadDown":
-						if (count == 1) {
-							controlValue.Pitch--;
-							if (controlValue.Pitch < -180) {
-								controlValue.Pitch = 180;
-							}
-						}
+						return;
 						break;
 					case "dpadRight":
 						if (count == 1) {
-							controlValue.Roll++;
-							if (controlValue.Roll > 180) {
-								controlValue.Roll = -180;
-							}
+							x++;
 						}
 						break;
 					case "dpadLeft":
 						if (count == 1) {
-							controlValue.Roll--;
-							if (controlValue.Roll < -180) {
-								controlValue.Roll = 180;
-							}
+							x--;
+						}
+						break;
+					case "dpadUp":
+						if (count == 1) {
+							y++;
+						}
+						break;
+					case "dpadDown":
+						if (count == 1) {
+							y--;
 						}
 						break;
 					case "rightBumper":
 						if (count == 1) {
-							controlValue.Yaw++;
-							if (controlValue.Yaw > 180) {
-								controlValue.Yaw = -180;
-							}
+							z++;
 						}
 						break;
 					case "leftBumper":
 						if (count == 1) {
-							controlValue.Yaw--;
-							if (controlValue.Yaw < -180) {
-								controlValue.Yaw = 180;
-							}
+							z--;
 						}
 						break;
 					default:
 						alert(key);
+						return;
+					}
+					if (!command_processing) {
+						command_processing = true;
+						if (socket == null) {
+							return;
+						}
+
+						if (viewMode == ViewModeEnum.Drive) {
+							var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
+							var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+									.degToRad(vehicleAttitude.Yaw), "ZYX"));
+							quaternion.multiply(quat_correct);
+							var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
+							controlValue.Roll = THREE.Math.radToDeg(euler.x);
+							controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
+							controlValue.Yaw = THREE.Math.radToDeg(euler.z);
+						}
+
+						x = y = z = 0;
+
+						socket.emit('setControlValue', controlValue, function(obj) {
+							command_processing = false;
+						});
+						setTimeout(function() {
+							if (command_processing) {
+								command_processing = false;
+							}
+						}, 5000);
 					}
 				}
 			}
+		},
 
-			myself.animate();
+		initMouseEventLisener : function() {
+			var down = false;
+			var sx = 0, sz = 0;
+			window.onmousedown = function(ev) {
+				down = true;
+				sx = ev.clientX;
+				sz = ev.clientY;
+			};
+			window.onmouseup = function() {
+				down = false;
+			};
+			window.onmousemove = function(ev) {
+				if (!down || ev.button != 1) {
+					return;
+				}
+				var dx = -(ev.clientX - sx);
+				var dz = -(ev.clientY - sz);
+				sx -= dx;
+				sz -= dz;
+
+				var theta = dx / 10;
+				var phi = -dz / 10;
+
+				var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(phi), THREE.Math.degToRad(-theta), THREE.Math.degToRad(0), "ZYX"));
+				var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(myAttitude.Roll), THREE.Math.degToRad(-myAttitude.Pitch), THREE.Math.degToRad(myAttitude.Yaw),
+						"ZYX"));
+				quaternion.multiply(quat_correct);
+				var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
+				myAttitude.Roll = THREE.Math.radToDeg(euler.x);
+				myAttitude.Pitch = THREE.Math.radToDeg(-euler.y);
+				myAttitude.Yaw = THREE.Math.radToDeg(euler.z);
+			}
 		},
 
 		animate : function() {
 			if (viewMode == ViewModeEnum.Dive) {
-				myself.omvr.set_myAttitude(myAttitude);
-				myself.omvr.set_vehicleAttitude(vehicleAttitude);
+				self.omvr.set_myAttitude(myAttitude);
+				self.omvr.set_vehicleAttitude(vehicleAttitude);
 			} else {
-				myself.omvr.set_myAttitude(myAttitude);
-				myself.omvr.set_vehicleAttitude({
+				self.omvr.set_myAttitude(myAttitude);
+				self.omvr.set_vehicleAttitude({
 					Roll : 90,
 					Pitch : 0,
 					Yaw : 0
 				});
 			}
 
-			myself.omvr.animate();
+			self.omvr.animate();
 
 			{// status
 				controlValueNode.nodeValue = controlValue.Throttle.toFixed(0) + "%" + " " + controlValue.Roll + " " + controlValue.Pitch + " " + controlValue.Yaw;
@@ -247,7 +308,7 @@ function OMVC() {
 				omgamepad.handleGamepad();
 			}
 
-			requestAnimationFrame(myself.animate);
+			requestAnimationFrame(self.animate);
 		},
 
 		connectFcm : function(value) {
@@ -280,5 +341,5 @@ function OMVC() {
 			viewMode = ViewModeEnum.Drive;
 		}
 	};
-	return myself;
+	return self;
 }
