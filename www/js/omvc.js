@@ -34,9 +34,10 @@ function OMVC() {
 		Yaw : 0
 	};
 
-	var ViewModeEnum = {
-		Dive : 0,
-		Drive : 1
+	var OperationModeEnum = {
+		Hobby : 0,
+		Dive : 1,
+		Drive : 2
 	};
 
 	window.addEventListener("orientationchange", function() {
@@ -54,7 +55,9 @@ function OMVC() {
 	var actuatorMsgNode = document.createTextNode("");
 	var attitudeMsgNode = document.createTextNode("");
 
-	var viewMode = ViewModeEnum.Dive;
+	var operationMode = OperationModeEnum.Dive;
+	
+	var command_processing = false;
 
 	var self = {
 		omvr : new OMVR(),
@@ -132,7 +135,6 @@ function OMVC() {
 
 		initGamepadEventLisener : function() {
 			if (omgamepad) {
-				var command_processing = false;
 				var x = 0, y = 0, z = 0;
 				omgamepad.gamepadCallback = function(key, value, count) {
 					switch (key) {
@@ -196,40 +198,15 @@ function OMVC() {
 						alert(key);
 						return;
 					}
-					if (!command_processing) {
-						command_processing = true;
-						if (socket == null) {
-							return;
-						}
-
-						if (viewMode == ViewModeEnum.Drive) {
-							var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
-							var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
-									.degToRad(vehicleAttitude.Yaw), "ZYX"));
-							quaternion.multiply(quat_correct);
-							var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
-							controlValue.Roll = THREE.Math.radToDeg(euler.x);
-							controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
-							controlValue.Yaw = THREE.Math.radToDeg(euler.z);
-						}
-
+					var bln = self.incrementControlValue(x,y,z);
+					if(bln){
 						x = y = z = 0;
-
-						socket.emit('setControlValue', controlValue, function(obj) {
-							command_processing = false;
-						});
-						setTimeout(function() {
-							if (command_processing) {
-								command_processing = false;
-							}
-						}, 5000);
 					}
 				}
 			}
 		},
 
 		initKeyboardEventLisener : function() {
-			var command_processing = false;
 			var x = 0, y = 0, z = 0;
 			window.onkeydown = function(e) {
 				var count = 1;
@@ -295,35 +272,56 @@ function OMVC() {
 					alert(key);
 					return;
 				}
-				if (!command_processing) {
-					command_processing = true;
-					if (socket == null) {
-						return;
-					}
-
-					if (viewMode == ViewModeEnum.Drive) {
-						var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
-						var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
-								.degToRad(vehicleAttitude.Yaw), "ZYX"));
-						quaternion.multiply(quat_correct);
-						var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
-						controlValue.Roll = THREE.Math.radToDeg(euler.x);
-						controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
-						controlValue.Yaw = THREE.Math.radToDeg(euler.z);
-					}
-
+				var bln = self.incrementControlValue(x,y,z);
+				if(bln){
 					x = y = z = 0;
-
-					socket.emit('setControlValue', controlValue, function(obj) {
-						command_processing = false;
-					});
-					setTimeout(function() {
-						if (command_processing) {
-							command_processing = false;
-						}
-					}, 5000);
 				}
 			}
+		},
+		
+		incrementControlValue : function(x,y,z){
+			if (!command_processing) {
+				command_processing = true;
+				if (socket == null) {
+					return false;
+				}
+
+				if (operationMode == OperationModeEnum.Drive) {
+					var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
+					var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+							.degToRad(vehicleAttitude.Yaw), "ZYX"));
+					quaternion.multiply(quat_correct);
+					var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
+					controlValue.Roll = THREE.Math.radToDeg(euler.x);
+					controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
+					controlValue.Yaw = THREE.Math.radToDeg(euler.z);
+				} else if (operationMode == OperationModeEnum.Hobby) {
+					function validateDeg(value) {
+						if (value > 180) {
+							value -= 360;
+						}
+						if (value < -180) {
+							value += 360;
+						}
+						return value;
+					}
+					controlValue.Roll = validateDeg(controlValue.Roll + x);
+					controlValue.Pitch = validateDeg(controlValue.Pitch + y);
+					controlValue.Yaw = validateDeg(controlValue.Yaw + z);
+				}
+
+				socket.emit('setControlValue', controlValue, function(obj) {
+					command_processing = false;
+				});
+				setTimeout(function() {
+					if (command_processing) {
+						command_processing = false;
+					}
+				}, 5000);
+				
+				return true;
+			}
+			return false;
 		},
 
 		initMouseEventLisener : function() {
@@ -361,7 +359,7 @@ function OMVC() {
 		},
 
 		animate : function() {
-			if (viewMode == ViewModeEnum.Dive) {
+			if (operationMode == OperationModeEnum.Dive) {
 				self.omvr.setMyAttitude(myAttitude);
 				self.omvr.setVehicleAttitude(vehicleAttitude);
 			} else {
@@ -460,12 +458,18 @@ function OMVC() {
 			}
 		},
 
-		setDiveMode : function() {
-			viewMode = ViewModeEnum.Dive;
-		},
-
-		setDriveMode : function() {
-			viewMode = ViewModeEnum.Drive;
+		setOperationMode : function(mode) {
+			switch (mode) {
+			case "dive":
+				operationMode = OperationModeEnum.Dive;
+				break;
+			case "drive":
+				operationMode = OperationModeEnum.Drive;
+				break;
+			case "hobby":
+				operationMode = OperationModeEnum.Hobby;
+				break;
+			}
 		}
 	};
 	return self;
