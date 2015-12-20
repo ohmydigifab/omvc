@@ -87,7 +87,7 @@
 		align="center"> <ons-col>Connect</ons-col> <ons-col align="right"> <ons-switch var="swConnect" onchange="omvc.connectFcm(swConnect.isChecked());"></ons-switch> </ons-col> </ons-row> </ons-list-item> <ons-list-item
 		class="menu-item" ng-click="app.navi.pushPage('about.html');menu.closeMenu();"> <ons-icon icon="fa-info-circle" fixed-width="true"></ons-icon> About </ons-list-item> </ons-list> </ons-page> </ons-template>
 
-	<ons-template id="main.html"> <ons-page>
+	<ons-template id="main.html"> <ons-navigator animation="slide" var="app.navi"> <ons-page>
 	<div class="main_view" id="container">
 		<canvas id="vrCanvas"></canvas>
 		<div id="overlay">
@@ -105,7 +105,7 @@
 			</div>
 		</div>
 	</div>
-	</ons-page> </ons-template>
+	</ons-page> </ons-navigator> </ons-template>
 
 	<ons-template id="about.html"> <ons-page> <ons-toolbar>
 	<div class="left">
