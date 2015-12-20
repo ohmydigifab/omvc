@@ -12,11 +12,11 @@ function OMVC() {
 		Yaw : 0
 	};
 	var actuatorValue = {
-			LeftTop : 0,
-			LeftBottom : 0
-			RightTop : 0,
-			RightBottom : 0,
-		};
+		LeftTop : 0,
+		LeftBottom : 0,
+		RightTop : 0,
+		RightBottom : 0
+	};
 	var debug_msg = "";
 
 	var myAttitude_init = null;
@@ -114,10 +114,10 @@ function OMVC() {
 					console.log(obj);
 					swConnect.setChecked(obj.FlightTelemetryStats.Status);
 					swArm.setChecked(obj.FlightStatus.Armed);
-					
-					actuatorValue.LeftTop = ActuatorCommand.Channel0;					
-					actuatorValue.LeftBottom = ActuatorCommand.Channel3;					
-					actuatorValue.RightTop = ActuatorCommand.Channel1;					
+
+					actuatorValue.LeftTop = ActuatorCommand.Channel0;
+					actuatorValue.LeftBottom = ActuatorCommand.Channel3;
+					actuatorValue.RightTop = ActuatorCommand.Channel1;
 					actuatorValue.RightBottom = ActuatorCommand.Channel2;
 				});
 				socket.on('msg', function(msg) {
@@ -263,8 +263,8 @@ function OMVC() {
 
 		animate : function() {
 			if (viewMode == ViewModeEnum.Dive) {
-				self.omvr.setMyAttitude(myAttitude);
-				self.omvr.setVehicleAttitude(vehicleAttitude);
+				self.omvr.set_myAttitude(myAttitude);
+				self.omvr.set_vehicleAttitude(vehicleAttitude);
 			} else {
 				self.omvr.setMyAttitude(myAttitude);
 				self.omvr.setVehicleAttitude({
@@ -342,7 +342,7 @@ function OMVC() {
 				break;
 			}
 		},
-		
+
 		setMyAttitude : function(value) {
 			myAttitude = value;
 			if (myAttitude_init == null) {
@@ -351,7 +351,7 @@ function OMVC() {
 				myAttitude.Yaw -= myAttitude_init.Yaw;
 			}
 		},
-		
+
 		setVehicleAttitude : function(value) {
 			vehicleAttitude = value;
 			if (vehicleAttitude_init == null) {
