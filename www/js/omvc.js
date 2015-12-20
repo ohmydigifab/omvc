@@ -420,27 +420,16 @@ function OMVC() {
 			var infoTypeBoxElement = document.getElementById("infoTypeBox");
 			infoTypeBoxElement.style.display = value ? "block" : "none";
 		},
-		setInfoType : function(type) {
+		setInfoType : function(type, bln) {
 			switch (type) {
-			case "none":
-				document.getElementById("attitudeMsgBox").style.display = "none";
-				document.getElementById("actuatorMsgBox").style.display = "none";
-				document.getElementById("debugMsgBox").style.display = "none";
-				break;
 			case "attitude":
-				document.getElementById("attitudeMsgBox").style.display = "block";
-				document.getElementById("actuatorMsgBox").style.display = "none";
-				document.getElementById("debugMsgBox").style.display = "none";
+				document.getElementById("attitudeMsgBox").style.display = bln ? "block" : "none";
 				break;
 			case "actuator":
-				document.getElementById("attitudeMsgBox").style.display = "none";
-				document.getElementById("actuatorMsgBox").style.display = "block";
-				document.getElementById("debugMsgBox").style.display = "none";
+				document.getElementById("actuatorMsgBox").style.display = bln ? "block" : "none";
 				break;
 			case "debug":
-				document.getElementById("attitudeMsgBox").style.display = "none";
-				document.getElementById("actuatorMsgBox").style.display = "none";
-				document.getElementById("debugMsgBox").style.display = "block";
+				document.getElementById("debugMsgBox").style.display = bln ? "block" : "none";
 				break;
 			}
 		},

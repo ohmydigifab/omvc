@@ -70,19 +70,15 @@
 		onchange="omvc.setInfoboxEnabled(swInfoBox.isChecked());"></ons-switch> </ons-col> </ons-row> <ons-list-item class="menu-item" id="infoTypeBox">
 	<div class="button-bar" style="width: 240px;">
 		<div class="button-bar__item">
-			<input type="radio" name="radioInfoType" onclick="omvc.setInfoType('none')" checked>
-			<button class="button-bar__button">None</button>
-		</div>
-		<div class="button-bar__item">
-			<input type="radio" name="radioInfoType" onclick="omvc.setInfoType('attitude')">
+			<input type="checkbox" name="radioInfoType" id="chkAttitudeInfo" onclick="omvc.setInfoType('attitude', document.getElementById('chkAttitudeInfo').checked)">
 			<button class="button-bar__button">Attitude</button>
 		</div>
 		<div class="button-bar__item">
-			<input type="radio" name="radioInfoType" onclick="omvc.setInfoType('actuator')">
+			<input type="checkbox" name="radioInfoType" id="chkActuatorInfo" onclick="omvc.setInfoType('actuator', document.getElementById('chkActuatorInfo').checked)">
 			<button class="button-bar__button">Actuator</button>
 		</div>
 		<div class="button-bar__item">
-			<input type="radio" name="radioInfoType" onclick="omvc.setInfoType('debug')">
+			<input type="checkbox" name="radioInfoType" id="chkDebugInfo" onclick="omvc.setInfoType('debug', document.getElementById('chkDebugInfo').checked)">
 			<button class="button-bar__button">Debug</button>
 		</div>
 	</div>
