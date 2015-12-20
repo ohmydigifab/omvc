@@ -56,7 +56,7 @@ function OMVC() {
 	var attitudeMsgNode = document.createTextNode("");
 
 	var operationMode = OperationModeEnum.Dive;
-	
+
 	var command_processing = false;
 
 	var self = {
@@ -195,11 +195,11 @@ function OMVC() {
 						}
 						break;
 					default:
-						//alert(key);
+						// alert(key);
 						return;
 					}
-					var bln = self.incrementControlValue(x,y,z);
-					if(bln){
+					var bln = self.incrementControlValue(x, y, z);
+					if (bln) {
 						x = y = z = 0;
 					}
 				}
@@ -269,17 +269,17 @@ function OMVC() {
 					}
 					break;
 				default:
-					//alert(key);
+					// alert(key);
 					return;
 				}
-				var bln = self.incrementControlValue(x,y,z);
-				if(bln){
+				var bln = self.incrementControlValue(x, y, z);
+				if (bln) {
 					x = y = z = 0;
 				}
 			}
 		},
-		
-		incrementControlValue : function(x,y,z){
+
+		incrementControlValue : function(x, y, z) {
 			if (!command_processing) {
 				command_processing = true;
 				if (socket == null) {
@@ -318,7 +318,7 @@ function OMVC() {
 						command_processing = false;
 					}
 				}, 5000);
-				
+
 				return true;
 			}
 			return false;
@@ -359,16 +359,21 @@ function OMVC() {
 		},
 
 		animate : function() {
-			if (operationMode == OperationModeEnum.Dive) {
-				self.omvr.setMyAttitude(myAttitude);
-				self.omvr.setVehicleAttitude(vehicleAttitude);
-			} else {
+			switch (operationMode) {
+			case OperationModeEnum.Drive:
 				self.omvr.setMyAttitude(myAttitude);
 				self.omvr.setVehicleAttitude({
 					Roll : 90,
 					Pitch : 0,
 					Yaw : 0
 				});
+				break;
+			case OperationModeEnum.Hobby:
+			case OperationModeEnum.Dive:
+			default:
+				self.omvr.setMyAttitude(myAttitude);
+				self.omvr.setVehicleAttitude(vehicleAttitude);
+				break;
 			}
 
 			self.omvr.animate();
