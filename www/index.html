@@ -61,13 +61,21 @@
 			<input type="radio" name="segment-a" onclick="omvc.setDriveMode()">
 			<button class="button-bar__button">Drive</button>
 		</div>
+		<div class="button-bar__item">
+			<input type="radio" name="segment-a" onclick="omvc.setOperationMode('hobby')">
+			<button class="button-bar__button">Hobby</button>
+		</div>
 	</div>
 	</ons-list-item> <ons-list-item class="menu-item"> <ons-row align="center"> <ons-col>InfoBox</ons-col> <ons-col align="right"> <ons-switch var="swInfoBox"
-		onchange="omvc.set_infobox_enabled(swInfoBox.isChecked());"></ons-switch> </ons-col> </ons-row> <ons-list-item class="menu-item" id="infoTypeBox">
+		onchange="omvc.setInfoboxEnabled(swInfoBox.isChecked());"></ons-switch> </ons-col> </ons-row> <ons-list-item class="menu-item" id="infoTypeBox">
 	<div class="button-bar" style="width: 240px;">
 		<div class="button-bar__item">
 			<input type="radio" name="radioInfoType" onclick="omvc.setInfoType('none')" checked>
 			<button class="button-bar__button">None</button>
+		</div>
+		<div class="button-bar__item">
+			<input type="radio" name="radioInfoType" onclick="omvc.setInfoType('actuator')">
+			<button class="button-bar__button">Actuator</button>
 		</div>
 		<div class="button-bar__item">
 			<input type="radio" name="radioInfoType" onclick="omvc.setInfoType('debug')">
@@ -81,13 +89,19 @@
 
 	<ons-template id="main.html"> <ons-page>
 	<div class="main_view" id="container">
-		<canvas id="vr_canvas"></canvas>
+		<canvas id="vrCanvas"></canvas>
 		<div id="overlay">
-			<div>
-				Control: <span id="control_values"></span>
+			<div id="controlMsgBox">
+				Control: <span id="controlMsg"></span>
+			</div>
+			<div id="actuatorMsgBox">
+				Actuator: <span id="actuatorMsg"></span>
+			</div>
+			<div id="attitudeMsgBox">
+				Attitude: <span id="attitudeMsg"></span>
 			</div>
 			<div id="debugMsgBox">
-				DebugMsg: <span id="debug_msg"></span>
+				DebugMsg: <span id="debugMsg"></span>
 			</div>
 		</div>
 	</div>

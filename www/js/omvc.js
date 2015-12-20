@@ -11,6 +11,12 @@ function OMVC() {
 		// -180 - 180
 		Yaw : 0
 	};
+	var actuatorValue = {
+			LeftTop : 0,
+			LeftBottom : 0
+			RightTop : 0,
+			RightBottom : 0,
+		};
 	var debug_msg = "";
 
 	var myAttitude_init = null;
@@ -37,50 +43,20 @@ function OMVC() {
 		// alert(window.orientation);
 	});
 
-	var overlayElement = document.getElementById("overlay");
-	overlayElement.style.display = "none";
-	var infoTypeBoxElement = document.getElementById("infoTypeBox");
-	infoTypeBoxElement.style.display = "none";
+	document.getElementById("overlay").style.display = "none";
+	document.getElementById("infoTypeBox").style.display = "none";
 	document.getElementById("debugMsgBox").style.display = "none";
+	document.getElementById("actuatorMsgBox").style.display = "none";
+	document.getElementById("attitudeMsgBox").style.display = "none";
 
-	var controlValueNode = document.createTextNode("");
+	var controlMsgNode = document.createTextNode("");
 	var debugMsgNode = document.createTextNode("");
+	var actuatorMsgNode = document.createTextNode("");
+	var attitudeMsgNode = document.createTextNode("");
 
 	var viewMode = ViewModeEnum.Dive;
 
 	var self = {
-		set_infobox_enabled : function(value) {
-			var overlayElement = document.getElementById("overlay");
-			overlayElement.style.display = value ? "block" : "none";
-			var infoTypeBoxElement = document.getElementById("infoTypeBox");
-			infoTypeBoxElement.style.display = value ? "block" : "none";
-		},
-		setInfoType : function(type) {
-			switch (type) {
-			case "none":
-				document.getElementById("debugMsgBox").style.display = "none";
-				break;
-			case "debug":
-				document.getElementById("debugMsgBox").style.display = "block";
-				break;
-			}
-		},
-		set_myAttitude : function(value) {
-			myAttitude = value;
-			if (myAttitude_init == null) {
-				myAttitude_init = value;
-			} else {
-				myAttitude.Yaw -= myAttitude_init.Yaw;
-			}
-		},
-		set_vehicleAttitude : function(value) {
-			vehicleAttitude = value;
-			if (vehicleAttitude_init == null) {
-				vehicleAttitude_init = value;
-			} else {
-				vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
-			}
-		},
 		omvr : new OMVR(),
 		init : function() {
 
@@ -93,15 +69,13 @@ function OMVC() {
 		},
 
 		initOmvr : function() {
-			// look up the elements we want to affect
-			var controlValueElement = document.getElementById("control_values");
-			var debugMsgElement = document.getElementById("debug_msg");
-
 			// Add those text nodes where they need to go
-			controlValueElement.appendChild(controlValueNode);
-			debugMsgElement.appendChild(debugMsgNode);
+			document.getElementById("controlMsg").appendChild(controlMsgNode);
+			document.getElementById("debugMsg").appendChild(debugMsgNode);
+			document.getElementById("actuatorMsg").appendChild(actuatorMsgNode);
+			document.getElementById("attitudeMsg").appendChild(attitudeMsgNode);
 
-			var canvas = document.getElementById('vr_canvas');
+			var canvas = document.getElementById('vrCanvas');
 			self.omvr.init(canvas);
 			self.omvr.add_fisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
 				if (socket == null) {
@@ -109,9 +83,7 @@ function OMVC() {
 				}
 				socket.emit('getAttitude', function(obj) {
 					// console.log(obj);
-					self.set_vehicleAttitude(obj);
-					debug_msg = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
-					debug_msg += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
+					self.setVehicleAttitude(obj);
 				});
 			}, {
 				Roll : 0,
@@ -142,6 +114,11 @@ function OMVC() {
 					console.log(obj);
 					swConnect.setChecked(obj.FlightTelemetryStats.Status);
 					swArm.setChecked(obj.FlightStatus.Armed);
+					
+					actuatorValue.LeftTop = ActuatorCommand.Channel0;					
+					actuatorValue.LeftBottom = ActuatorCommand.Channel3;					
+					actuatorValue.RightTop = ActuatorCommand.Channel1;					
+					actuatorValue.RightBottom = ActuatorCommand.Channel2;
 				});
 				socket.on('msg', function(msg) {
 					console.log('msg:' + msg);
@@ -286,11 +263,11 @@ function OMVC() {
 
 		animate : function() {
 			if (viewMode == ViewModeEnum.Dive) {
-				self.omvr.set_myAttitude(myAttitude);
-				self.omvr.set_vehicleAttitude(vehicleAttitude);
+				self.omvr.setMyAttitude(myAttitude);
+				self.omvr.setVehicleAttitude(vehicleAttitude);
 			} else {
-				self.omvr.set_myAttitude(myAttitude);
-				self.omvr.set_vehicleAttitude({
+				self.omvr.setMyAttitude(myAttitude);
+				self.omvr.setVehicleAttitude({
 					Roll : 90,
 					Pitch : 0,
 					Yaw : 0
@@ -300,8 +277,11 @@ function OMVC() {
 			self.omvr.animate();
 
 			{// status
-				controlValueNode.nodeValue = controlValue.Throttle.toFixed(0) + "%" + " " + controlValue.Roll + " " + controlValue.Pitch + " " + controlValue.Yaw;
+				controlMsgNode.nodeValue = controlValue.Throttle.toFixed(0) + "%" + " " + controlValue.Roll + " " + controlValue.Pitch + " " + controlValue.Yaw;
+				actuatorMsgNode.nodeValue = actuatorValue.LeftTop.toFixed(0) + " " + actuatorValue.RightTop + " " + actuatorValue.RightBottom + " " + actuatorValue.LeftBottom;
 				debugMsgNode.nodeValue = debug_msg;
+				attitudeMsgNode.nodeValue = myAttitude.Roll.toFixed(0) + "," + myAttitude.Pitch.toFixed(0) + "," + myAttitude.Yaw.toFixed(0);
+				attitudeMsgNode.nodeValue += "\n" + vehicleAttitude.Roll.toFixed(0) + "," + vehicleAttitude.Pitch.toFixed(0) + "," + vehicleAttitude.Yaw.toFixed(0);
 			}
 
 			if (omgamepad) {
@@ -331,6 +311,54 @@ function OMVC() {
 					Yaw : 0
 				};
 			});
+		},
+		setInfoboxEnabled : function(value) {
+			var overlayElement = document.getElementById("overlay");
+			overlayElement.style.display = value ? "block" : "none";
+			var infoTypeBoxElement = document.getElementById("infoTypeBox");
+			infoTypeBoxElement.style.display = value ? "block" : "none";
+		},
+		setInfoType : function(type) {
+			switch (type) {
+			case "none":
+				document.getElementById("attitudeMsgBox").style.display = "none";
+				document.getElementById("actuatorMsgBox").style.display = "none";
+				document.getElementById("debugMsgBox").style.display = "none";
+				break;
+			case "attitude":
+				document.getElementById("attitudeMsgBox").style.display = "block";
+				document.getElementById("actuatorMsgBox").style.display = "none";
+				document.getElementById("debugMsgBox").style.display = "none";
+				break;
+			case "actuator":
+				document.getElementById("attitudeMsgBox").style.display = "none";
+				document.getElementById("actuatorMsgBox").style.display = "block";
+				document.getElementById("debugMsgBox").style.display = "none";
+				break;
+			case "debug":
+				document.getElementById("attitudeMsgBox").style.display = "none";
+				document.getElementById("actuatorMsgBox").style.display = "none";
+				document.getElementById("debugMsgBox").style.display = "block";
+				break;
+			}
+		},
+		
+		setMyAttitude : function(value) {
+			myAttitude = value;
+			if (myAttitude_init == null) {
+				myAttitude_init = value;
+			} else {
+				myAttitude.Yaw -= myAttitude_init.Yaw;
+			}
+		},
+		
+		setVehicleAttitude : function(value) {
+			vehicleAttitude = value;
+			if (vehicleAttitude_init == null) {
+				vehicleAttitude_init = value;
+			} else {
+				vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
+			}
 		},
 
 		setDiveMode : function() {
