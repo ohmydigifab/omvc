@@ -195,7 +195,7 @@ function OMVC() {
 						}
 						break;
 					default:
-						alert(key);
+						//alert(key);
 						return;
 					}
 					var bln = self.incrementControlValue(x,y,z);
@@ -269,7 +269,7 @@ function OMVC() {
 					}
 					break;
 				default:
-					alert(key);
+					//alert(key);
 					return;
 				}
 				var bln = self.incrementControlValue(x,y,z);
