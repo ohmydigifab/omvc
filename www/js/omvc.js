@@ -55,7 +55,7 @@ function OMVC() {
 	var actuatorMsgNode = document.createTextNode("");
 	var attitudeMsgNode = document.createTextNode("");
 
-	var operationMode = OperationModeEnum.Dive;
+	var operationMode = OperationModeEnum.Hobby;
 
 	var command_processing = false;
 
