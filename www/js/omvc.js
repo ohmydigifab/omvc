@@ -77,7 +77,7 @@ function OMVC() {
 
 			var canvas = document.getElementById('vrCanvas');
 			self.omvr.init(canvas);
-			self.omvr.add_fisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
+			self.omvr.addFisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
 				if (socket == null) {
 					return;
 				}
@@ -90,7 +90,7 @@ function OMVC() {
 				Pitch : 0,
 				Yaw : 0
 			});
-			self.omvr.add_fisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.17:9000/?action=snapshot', false, true, function() {
+			self.omvr.addFisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.17:9000/?action=snapshot', false, true, function() {
 			}, {
 				Roll : 180,
 				Pitch : 0,
@@ -263,8 +263,8 @@ function OMVC() {
 
 		animate : function() {
 			if (viewMode == ViewModeEnum.Dive) {
-				self.omvr.set_myAttitude(myAttitude);
-				self.omvr.set_vehicleAttitude(vehicleAttitude);
+				self.omvr.setMyAttitude(myAttitude);
+				self.omvr.setVehicleAttitude(vehicleAttitude);
 			} else {
 				self.omvr.setMyAttitude(myAttitude);
 				self.omvr.setVehicleAttitude({

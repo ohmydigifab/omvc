@@ -86,7 +86,7 @@
 			<button class="button-bar__button">Debug</button>
 		</div>
 	</div>
-	</ons-list-item> <ons-row align="center"> <ons-col>Stereo</ons-col> <ons-col align="right"> <ons-switch var="swStereoView" onchange="omvc.omvr.set_stero_enabled(swStereoView.isChecked());"></ons-switch>
+	</ons-list-item> <ons-row align="center"> <ons-col>Stereo</ons-col> <ons-col align="right"> <ons-switch var="swStereoView" onchange="omvc.omvr.setStereoEnabled(swStereoView.isChecked());"></ons-switch>
 	</ons-col> </ons-row> <ons-row align="center"> <ons-col>Arm</ons-col> <ons-col align="right"> <ons-switch var="swArm" onchange="omvc.setArm(swArm.isChecked());"></ons-switch> </ons-col> </ons-row> <ons-row
 		align="center"> <ons-col>Connect</ons-col> <ons-col align="right"> <ons-switch var="swConnect" onchange="omvc.connectFcm(swConnect.isChecked());"></ons-switch> </ons-col> </ons-row> </ons-list-item> <ons-list-item
 		class="menu-item" ng-click="app.navi.pushPage('about.html');menu.closeMenu();"> <ons-icon icon="fa-info-circle" fixed-width="true"></ons-icon> About </ons-list-item> </ons-list> </ons-page> </ons-template>
