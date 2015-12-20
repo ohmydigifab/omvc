@@ -63,6 +63,7 @@ function OMVC() {
 			self.initSocket();
 			self.initOmvr();
 			self.initGamepadEventLisener();
+			self.initKeyboardEventLisener();
 			self.initMouseEventLisener();
 
 			self.animate();
@@ -115,10 +116,10 @@ function OMVC() {
 					swConnect.setChecked(obj.FlightTelemetryStats.Status);
 					swArm.setChecked(obj.FlightStatus.Armed);
 
-					actuatorValue.LeftTop = ActuatorCommand.Channel0;
-					actuatorValue.LeftBottom = ActuatorCommand.Channel3;
-					actuatorValue.RightTop = ActuatorCommand.Channel1;
-					actuatorValue.RightBottom = ActuatorCommand.Channel2;
+					actuatorValue.LeftTop = obj.ActuatorCommand.ChannelIdx0;
+					actuatorValue.LeftBottom = obj.ActuatorCommand.ChannelIdx3;
+					actuatorValue.RightTop = obj.ActuatorCommand.ChannelIdx1;
+					actuatorValue.RightBottom = obj.ActuatorCommand.ChannelIdx2;
 				});
 				socket.on('msg', function(msg) {
 					console.log('msg:' + msg);
@@ -223,6 +224,104 @@ function OMVC() {
 							}
 						}, 5000);
 					}
+				}
+			}
+		},
+
+		initKeyboardEventLisener : function() {
+			var command_processing = false;
+			var x = 0, y = 0, z = 0;
+			window.onkeydown = function(e) {
+				var count = 1;
+				var key = String.fromCharCode(e.keyCode);
+				switch (key) {
+				case "H":
+					if (count == 1) {
+						controlValue.Throttle++;
+						if (controlValue.Throttle > 100) {
+							controlValue.Throttle = 100;
+						}
+					}
+					break;
+				case "J":
+					if (count == 1) {
+						controlValue.Throttle--;
+						if (controlValue.Throttle < 0) {
+							controlValue.Throttle = 0;
+						}
+					}
+					break;
+				case "K":
+					if (count == 1) {
+					}
+					return;
+					break;
+				case "L":
+					if (count == 1) {
+					}
+					return;
+					break;
+				case "D":
+					if (count == 1) {
+						x++;
+					}
+					break;
+				case "A":
+					if (count == 1) {
+						x--;
+					}
+					break;
+				case "W":
+					if (count == 1) {
+						y++;
+					}
+					break;
+				case "X":
+					if (count == 1) {
+						y--;
+					}
+					break;
+				case "Y":
+					if (count == 1) {
+						z++;
+					}
+					break;
+				case "O":
+					if (count == 1) {
+						z--;
+					}
+					break;
+				default:
+					alert(key);
+					return;
+				}
+				if (!command_processing) {
+					command_processing = true;
+					if (socket == null) {
+						return;
+					}
+
+					if (viewMode == ViewModeEnum.Drive) {
+						var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
+						var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+								.degToRad(vehicleAttitude.Yaw), "ZYX"));
+						quaternion.multiply(quat_correct);
+						var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
+						controlValue.Roll = THREE.Math.radToDeg(euler.x);
+						controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
+						controlValue.Yaw = THREE.Math.radToDeg(euler.z);
+					}
+
+					x = y = z = 0;
+
+					socket.emit('setControlValue', controlValue, function(obj) {
+						command_processing = false;
+					});
+					setTimeout(function() {
+						if (command_processing) {
+							command_processing = false;
+						}
+					}, 5000);
 				}
 			}
 		},
