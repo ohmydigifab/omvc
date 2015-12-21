@@ -115,9 +115,9 @@ function OMVC() {
 				});
 				socket.on('pong', function(obj) {
 					console.log('pong!!');
-					console.log(obj);
-					swConnect.setChecked(obj.FlightTelemetryStats.Status);
-					swArm.setChecked(obj.FlightStatus.Armed);
+					// console.log(obj);
+					document.getElementById("chkConnect").checked = (obj.FlightTelemetryStats.Status)?true:false;
+					document.getElementById("chkArm").checked = (obj.FlightStatus.Armed)?true:false;
 
 					actuatorValue.LeftTop = obj.ActuatorCommand.ChannelIdx0;
 					actuatorValue.LeftBottom = obj.ActuatorCommand.ChannelIdx3;
@@ -156,6 +156,11 @@ function OMVC() {
 						break;
 					case "button2":
 						if (count == 1) {
+							controlValue.Roll = 0;
+							controlValue.Pitch = 0;
+							controlValue.Yaw = 0;
+							socket.emit('setControlValue', controlValue, function(obj) {
+							});
 						}
 						return;
 						break;
@@ -195,7 +200,7 @@ function OMVC() {
 						}
 						break;
 					default:
-						// alert(key);
+						console.log(key);
 						return;
 					}
 					var bln = self.incrementControlValue(x, y, z);
@@ -230,6 +235,11 @@ function OMVC() {
 					break;
 				case "K":
 					if (count == 1) {
+						controlValue.Roll = 0;
+						controlValue.Pitch = 0;
+						controlValue.Yaw = 0;
+						socket.emit('setControlValue', controlValue, function(obj) {
+						});
 					}
 					return;
 					break;
@@ -258,7 +268,7 @@ function OMVC() {
 						y--;
 					}
 					break;
-				case "Y":
+				case "I":
 					if (count == 1) {
 						z++;
 					}
@@ -269,7 +279,7 @@ function OMVC() {
 					}
 					break;
 				default:
-					// alert(key);
+					console.log(key);
 					return;
 				}
 				var bln = self.incrementControlValue(x, y, z);
@@ -414,12 +424,23 @@ function OMVC() {
 				};
 			});
 		},
+
+		calibrateLevel : function() {
+			if (socket == null) {
+				return;
+			}
+			socket.emit('calibrateLevel', function(res) {
+				document.getElementById("chkLevel").checked = false;
+			});
+		},
+
 		setInfoboxEnabled : function(value) {
 			var overlayElement = document.getElementById("overlay");
 			overlayElement.style.display = value ? "block" : "none";
 			var infoTypeBoxElement = document.getElementById("infoTypeBox");
 			infoTypeBoxElement.style.display = value ? "block" : "none";
 		},
+
 		setInfoType : function(type, bln) {
 			switch (type) {
 			case "attitude":

@@ -55,7 +55,7 @@ var app = {
 	},
 
 	onSuccess_attitude : function(attitude) {
-		omvc.set_myAttitude({
+		omvc.setMyAttitude({
 			Roll : attitude.alpha,
 			Pitch : attitude.beta,
 			Yaw : attitude.gamma,

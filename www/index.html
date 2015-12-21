@@ -22,7 +22,8 @@
 <meta charset="utf-8" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+<meta name="viewport"
+	content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
 
 <!-- JS dependencies (order matters!) -->
 <script src="lib/angular/angular.js"></script>
@@ -45,13 +46,14 @@
 <title>OMVCockpit</title>
 </head>
 <body ontouchmove="event.preventDefault()">
-	<ons-sliding-menu menu-page="menu.html" main-page="main.html" side="left" var="menu" type="push" max-slide-distance="260px" swipeable="true"> </ons-sliding-menu>
+	<ons-sliding-menu menu-page="menu.html" main-page="main.html" side="left" var="menu" type="push" max-slide-distance="260px" swipeable="true">
+	</ons-sliding-menu>
 
 	<ons-template id="menu.html"> <ons-page modifier="menu-page"> <ons-toolbar>
 	<div class="right">
 		<ons-toolbar-button ng-click="menu.closeMenu()"> <ons-icon icon="fa-times" size="28px" fixed-width="false"></ons-icon> </ons-toolbar-button>
 	</div>
-	</ons-toolbar> </ons-list-item> <ons-list-item class="menu-item">
+	</ons-toolbar> <ons-list> <ons-list-item class="menu-item">
 	<div class="button-bar" style="width: 240px;">
 		<div class="button-bar__item">
 			<input type="radio" name="segment-a" onclick="omvc.setOperationMode('hobby')" checked>
@@ -66,15 +68,17 @@
 			<button class="button-bar__button">Drive</button>
 		</div>
 	</div>
-	</ons-list-item> <ons-list-item class="menu-item"> <ons-row align="center"> <ons-col>InfoBox</ons-col> <ons-col align="right"> <ons-switch var="swInfoBox"
-		onchange="omvc.setInfoboxEnabled(swInfoBox.isChecked());"></ons-switch> </ons-col> </ons-row> <ons-list-item class="menu-item" id="infoTypeBox">
+	</ons-list-item> <ons-list-item class="menu-item"> <ons-row align="center"> <ons-col>InfoBox</ons-col> <ons-col align="right"> <ons-switch
+		var="swInfoBox" onchange="omvc.setInfoboxEnabled(swInfoBox.isChecked());"></ons-switch> </ons-col> </ons-row></ons-list-item> <ons-list-item class="menu-item" id="infoTypeBox">
 	<div class="button-bar" style="width: 240px;">
 		<div class="button-bar__item">
-			<input type="checkbox" name="radioInfoType" id="chkAttitudeInfo" onclick="omvc.setInfoType('attitude', document.getElementById('chkAttitudeInfo').checked)">
+			<input type="checkbox" name="radioInfoType" id="chkAttitudeInfo"
+				onclick="omvc.setInfoType('attitude', document.getElementById('chkAttitudeInfo').checked)">
 			<button class="button-bar__button">Attitude</button>
 		</div>
 		<div class="button-bar__item">
-			<input type="checkbox" name="radioInfoType" id="chkActuatorInfo" onclick="omvc.setInfoType('actuator', document.getElementById('chkActuatorInfo').checked)">
+			<input type="checkbox" name="radioInfoType" id="chkActuatorInfo"
+				onclick="omvc.setInfoType('actuator', document.getElementById('chkActuatorInfo').checked)">
 			<button class="button-bar__button">Actuator</button>
 		</div>
 		<div class="button-bar__item">
@@ -82,26 +86,44 @@
 			<button class="button-bar__button">Debug</button>
 		</div>
 	</div>
-	</ons-list-item> <ons-row align="center"> <ons-col>Stereo</ons-col> <ons-col align="right"> <ons-switch var="swStereoView" onchange="omvc.omvr.setStereoEnabled(swStereoView.isChecked());"></ons-switch>
-	</ons-col> </ons-row> <ons-row align="center"> <ons-col>Arm</ons-col> <ons-col align="right"> <ons-switch var="swArm" onchange="omvc.setArm(swArm.isChecked());"></ons-switch> </ons-col> </ons-row> <ons-row
-		align="center"> <ons-col>Connect</ons-col> <ons-col align="right"> <ons-switch var="swConnect" onchange="omvc.connectFcm(swConnect.isChecked());"></ons-switch> </ons-col> </ons-row> </ons-list-item> <ons-list-item
-		class="menu-item" ng-click="app.navi.pushPage('about.html');menu.closeMenu();"> <ons-icon icon="fa-info-circle" fixed-width="true"></ons-icon> About </ons-list-item> </ons-list> </ons-page> </ons-template>
+	</ons-list-item> <ons-list-item class="menu-item"> <ons-row align="center"> <ons-col>Stereo</ons-col> <ons-col
+		align="right"> <ons-switch var="swStereoView" onchange="omvc.omvr.setStereoEnabled(swStereoView.isChecked());"></ons-switch> </ons-col> </ons-row></ons-list-item> <ons-list-item class="menu-item" id="serviceCallBox">
+	<div class="button-bar" style="width: 240px;">
+		<div class="button-bar__item">
+			<input type="checkbox" name="radioInfoType" id="chkLevel" onclick="omvc.calibrateLevel()">
+			<button class="button-bar__button">Level</button>
+		</div>
+		<div class="button-bar__item">
+			<input type="checkbox" name="radioInfoType" id="chkArm" onclick="omvc.setArm('actuator', document.getElementById('chkArm').checked)">
+			<button class="button-bar__button">Arm</button>
+		</div>
+		<div class="button-bar__item">
+			<input type="checkbox" name="radioInfoType" id="chkConnect" onclick="omvc.connectFcm(document.getElementById('chkConnect').checked)">
+			<button class="button-bar__button">Connect</button>
+		</div>
+	</div>
+	</ons-list-item> <ons-list-item class="menu-item" ng-click="app.navi.pushPage('about.html');menu.closeMenu();"> <ons-icon icon="fa-info-circle"
+		fixed-width="true"></ons-icon> About </ons-list-item></ons-list></ons-page> </ons-template>
 
 	<ons-template id="main.html"> <ons-navigator animation="slide" var="app.navi"> <ons-page>
 	<div class="main_view" id="container">
 		<canvas id="vrCanvas"></canvas>
 		<div id="overlay">
 			<div id="controlMsgBox">
-				Control: <span id="controlMsg"></span>
+				Control:
+				<span id="controlMsg"></span>
 			</div>
 			<div id="actuatorMsgBox">
-				Actuator: <span id="actuatorMsg"></span>
+				Actuator:
+				<span id="actuatorMsg"></span>
 			</div>
 			<div id="attitudeMsgBox">
-				Attitude: <span id="attitudeMsg"></span>
+				Attitude:
+				<span id="attitudeMsg"></span>
 			</div>
 			<div id="debugMsgBox">
-				DebugMsg: <span id="debugMsg"></span>
+				DebugMsg:
+				<span id="debugMsg"></span>
 			</div>
 		</div>
 	</div>
