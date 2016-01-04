@@ -380,6 +380,15 @@ function OMVC() {
 			document.getElementById("chkConnect").onclick = function(ev) {
 				omvc.connectFcm(document.getElementById('chkConnect').checked);
 			};
+			document.getElementById("chkProxy").onclick = function(ev) {
+				omvc.setUdpProxyEnabled(document.getElementById('chkProxy').checked);
+			};
+		},
+
+		setUdpProxyEnabled : function(bln) {
+			if (socket) {
+				socket.emit('setUdpProxyEnabled', bln);
+			}
 		},
 
 		animate : function() {
