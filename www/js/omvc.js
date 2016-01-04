@@ -237,6 +237,7 @@ function OMVC() {
 					break;
 				case "K":
 					if (count == 1) {
+						controlValue.Throttle = 0;
 						controlValue.Roll = 0;
 						controlValue.Pitch = 0;
 						controlValue.Yaw = 0;
@@ -299,14 +300,27 @@ function OMVC() {
 				}
 
 				if (operationMode == OperationModeEnum.Drive) {
-					var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
-					var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
-							.degToRad(vehicleAttitude.Yaw), "ZYX"));
-					quaternion.multiply(quat_correct);
-					var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
-					controlValue.Roll = THREE.Math.radToDeg(euler.x);
-					controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
-					controlValue.Yaw = THREE.Math.radToDeg(euler.z);
+//					var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
+//					var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+//							.degToRad(vehicleAttitude.Yaw), "ZYX"));
+//					quaternion.multiply(quat_correct);
+//					var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
+//					controlValue.Roll = THREE.Math.radToDeg(euler.x);
+//					controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
+//					controlValue.Yaw = THREE.Math.radToDeg(euler.z);
+					
+					function validateDeg(value) {
+						if (value > 180) {
+							value -= 360;
+						}
+						if (value < -180) {
+							value += 360;
+						}
+						return value;
+					}
+					controlValue.Roll = validateDeg(controlValue.Roll + x);
+					controlValue.Pitch = validateDeg(controlValue.Pitch + y);
+					controlValue.Yaw = validateDeg(controlValue.Yaw + z);
 				} else if (operationMode == OperationModeEnum.Hobby) {
 					function validateDeg(value) {
 						if (value > 180) {
