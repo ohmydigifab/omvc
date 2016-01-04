@@ -90,15 +90,15 @@
 		align="right"> <ons-switch var="swStereoView" onchange="omvc.omvr.setStereoEnabled(swStereoView.isChecked());"></ons-switch> </ons-col> </ons-row></ons-list-item> <ons-list-item class="menu-item" id="serviceCallBox">
 	<div class="button-bar" style="width: 240px;">
 		<div class="button-bar__item">
-			<input type="checkbox" name="radioInfoType" id="chkLevel" onclick="omvc.calibrateLevel()">
+			<input type="checkbox" name="radioInfoType" id="chkLevel">
 			<button class="button-bar__button">Level</button>
 		</div>
 		<div class="button-bar__item">
-			<input type="checkbox" name="radioInfoType" id="chkArm" onclick="omvc.setArm('actuator', document.getElementById('chkArm').checked)">
+			<input type="checkbox" name="radioInfoType" id="chkArm">
 			<button class="button-bar__button">Arm</button>
 		</div>
 		<div class="button-bar__item">
-			<input type="checkbox" name="radioInfoType" id="chkConnect" onclick="omvc.connectFcm(document.getElementById('chkConnect').checked)">
+			<input type="checkbox" name="radioInfoType" id="chkConnect">
 			<button class="button-bar__button">Connect</button>
 		</div>
 	</div>

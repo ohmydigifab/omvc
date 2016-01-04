@@ -68,6 +68,7 @@ function OMVC() {
 			self.initGamepadEventLisener();
 			self.initKeyboardEventLisener();
 			self.initMouseEventLisener();
+			self.initViewEventLisener();
 
 			self.animate();
 		},
@@ -116,8 +117,8 @@ function OMVC() {
 				socket.on('pong', function(obj) {
 					console.log('pong!!');
 					// console.log(obj);
-					document.getElementById("chkConnect").checked = (obj.FlightTelemetryStats.Status)?true:false;
-					document.getElementById("chkArm").checked = (obj.FlightStatus.Armed)?true:false;
+					document.getElementById("chkConnect").checked = (obj.FlightTelemetryStats.Status) ? true : false;
+					document.getElementById("chkArm").checked = (obj.FlightStatus.Armed) ? true : false;
 
 					actuatorValue.LeftTop = obj.ActuatorCommand.ChannelIdx0;
 					actuatorValue.LeftBottom = obj.ActuatorCommand.ChannelIdx3;
@@ -156,6 +157,7 @@ function OMVC() {
 						break;
 					case "button2":
 						if (count == 1) {
+							controlValue.Throttle = 0;
 							controlValue.Roll = 0;
 							controlValue.Pitch = 0;
 							controlValue.Yaw = 0;
@@ -368,6 +370,18 @@ function OMVC() {
 			}
 		},
 
+		initViewEventLisener : function() {
+			document.getElementById("chkLevel").onclick = function(ev) {
+				omvc.calibrateLevel();
+			};
+			document.getElementById("chkArm").onclick = function(ev) {
+				omvc.setArm(document.getElementById('chkArm').checked);
+			};
+			document.getElementById("chkConnect").onclick = function(ev) {
+				omvc.connectFcm(document.getElementById('chkConnect').checked);
+			};
+		},
+
 		animate : function() {
 			switch (operationMode) {
 			case OperationModeEnum.Drive:
@@ -461,6 +475,9 @@ function OMVC() {
 				myAttitude_init = value;
 			} else {
 				myAttitude.Yaw -= myAttitude_init.Yaw;
+				if (vehicleAttitude_init == null) {
+					myAttitude.Yaw += vehicleAttitude_init.Yaw;
+				}
 			}
 		},
 
@@ -468,8 +485,6 @@ function OMVC() {
 			vehicleAttitude = value;
 			if (vehicleAttitude_init == null) {
 				vehicleAttitude_init = value;
-			} else {
-				vehicleAttitude.Yaw -= vehicleAttitude_init.Yaw;
 			}
 		},
 
