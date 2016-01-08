@@ -5,9 +5,45 @@
     },
     "config_munge": {
         "files": {
+            "framework": {
+                "parents": {
+                    "CoreMotion.framework": [
+                        {
+                            "xml": false,
+                            "count": 2
+                        }
+                    ],
+                    "GameController.framework": [
+                        {
+                            "xml": true,
+                            "count": 1
+                        }
+                    ],
+                    "QuartzCore.framework": [
+                        {
+                            "xml": true,
+                            "count": 1
+                        }
+                    ],
+                    "CoreLocation.framework": [
+                        {
+                            "xml": false,
+                            "count": 1
+                        }
+                    ]
+                }
+            },
             "config.xml": {
                 "parents": {
                     "/*": [
+                        {
+                            "xml": "<feature name=\"DeviceMotion\"><param name=\"ios-package\" value=\"CDVMotion\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Gamepad\"><param name=\"ios-package\" value=\"CordovaPluginGamepad\" /></feature>",
+                            "count": 1
+                        },
                         {
                             "xml": "<feature name=\"Console\"><param name=\"ios-package\" value=\"CDVLogger\" /></feature>",
                             "count": 1
@@ -23,42 +59,6 @@
                         {
                             "xml": "<feature name=\"Compass\"><param name=\"ios-package\" value=\"CDVCompass\" /></feature>",
                             "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"Gamepad\"><param name=\"ios-package\" value=\"CordovaPluginGamepad\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"DeviceMotion\"><param name=\"ios-package\" value=\"CDVMotion\" /></feature>",
-                            "count": 1
-                        }
-                    ]
-                }
-            },
-            "framework": {
-                "parents": {
-                    "CoreMotion.framework": [
-                        {
-                            "xml": false,
-                            "count": 2
-                        }
-                    ],
-                    "CoreLocation.framework": [
-                        {
-                            "xml": false,
-                            "count": 1
-                        }
-                    ],
-                    "GameController.framework": [
-                        {
-                            "xml": true,
-                            "count": 1
-                        }
-                    ],
-                    "QuartzCore.framework": [
-                        {
-                            "xml": true,
-                            "count": 1
                         }
                     ]
                 }
@@ -66,23 +66,23 @@
         }
     },
     "installed_plugins": {
-        "org.apache.cordova.console": {
-            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
-        },
-        "org.apache.cordova.device": {
-            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
-        },
-        "org.apache.cordova.device-motion": {
-            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
-        },
-        "org.apache.cordova.device-orientation": {
-            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        "com.idoctum.deviceattitude": {
+            "PACKAGE_NAME": "com.ohmydigifab.omvc"
         },
         "com.judax.cordova.plugin.gamepad": {
-            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+            "PACKAGE_NAME": "com.ohmydigifab.omvc"
         },
-        "com.idoctum.deviceattitude": {
-            "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        "org.apache.cordova.console": {
+            "PACKAGE_NAME": "com.ohmydigifab.omvc"
+        },
+        "org.apache.cordova.device": {
+            "PACKAGE_NAME": "com.ohmydigifab.omvc"
+        },
+        "org.apache.cordova.device-motion": {
+            "PACKAGE_NAME": "com.ohmydigifab.omvc"
+        },
+        "org.apache.cordova.device-orientation": {
+            "PACKAGE_NAME": "com.ohmydigifab.omvc"
         }
     },
     "dependent_plugins": {}
