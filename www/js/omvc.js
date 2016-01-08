@@ -70,6 +70,7 @@ function OMVC() {
 			self.initMouseEventLisener();
 			self.initViewEventLisener();
 
+			self.setOperationMode("hobby");
 			self.animate();
 		},
 
@@ -99,7 +100,7 @@ function OMVC() {
 			}, {
 				Roll : 180,
 				Pitch : 0,
-				Yaw : 0
+				Yaw : -90
 			});
 		},
 
@@ -416,6 +417,17 @@ function OMVC() {
 				});
 				break;
 			case OperationModeEnum.Hobby:
+				self.omvr.setMyAttitude({
+					Roll : 180,
+					Pitch : 0,
+					Yaw : 0
+				});
+				self.omvr.setVehicleAttitude({
+					Roll : 0,
+					Pitch : 0,
+					Yaw : 0
+				});
+				break;
 			case OperationModeEnum.Dive:
 			default:
 				self.omvr.setMyAttitude(myAttitude);
@@ -514,12 +526,15 @@ function OMVC() {
 		setOperationMode : function(mode) {
 			switch (mode) {
 			case "dive":
+				self.omvr.setFov(75);
 				operationMode = OperationModeEnum.Dive;
 				break;
 			case "drive":
+				self.omvr.setFov(75);
 				operationMode = OperationModeEnum.Drive;
 				break;
 			case "hobby":
+				self.omvr.setFov(100);
 				operationMode = OperationModeEnum.Hobby;
 				break;
 			}
