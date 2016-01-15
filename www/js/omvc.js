@@ -81,16 +81,30 @@ function OMVC() {
 			document.getElementById("actuatorMsg").appendChild(actuatorMsgNode);
 			document.getElementById("attitudeMsg").appendChild(attitudeMsgNode);
 
+			var requestAttitude = false;
 			var canvas = document.getElementById('vrCanvas');
 			self.omvr.init(canvas);
 			self.omvr.addFisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
 				if (socket == null) {
 					return;
 				}
-				socket.emit('getAttitude', function(obj) {
-					// console.log(obj);
-					self.setVehicleAttitude(obj);
-				});
+				if (!requestAttitude) {
+					requestAttitude = true;
+					var isDone = false;
+					socket.emit('getAttitude', function(obj) {
+						// console.log(obj);
+						isDone = true;
+						requestAttitude = false;
+						self.setVehicleAttitude(obj);
+					});
+					setTimeout(function() {
+						if (isDone) {
+							return;
+						}
+						console.log("timeout of requestAttitude");
+						requestAttitude = false;
+					}, 2000);
+				}
 			}, {
 				Roll : 0,
 				Pitch : 0,
@@ -113,7 +127,7 @@ function OMVC() {
 						var _starttime = new Date();
 						console.log('ping!!');
 						socket.emit('ping', _starttime);
-					}, 500);
+					}, 1000);
 				});
 				socket.on('pong', function(obj) {
 					console.log('pong!!');
@@ -139,9 +153,13 @@ function OMVC() {
 			if (omgamepad) {
 				var x = 0, y = 0, z = 0;
 				omgamepad.gamepadCallback = function(key, value, count) {
+					var enabled = (count == 1);
+					if (count > 20 && (count % 5) == 0) {
+						enabled = true;
+					}
 					switch (key) {
 					case "button0":
-						if (count == 1) {
+						if (enabled) {
 							controlValue.Throttle++;
 							if (controlValue.Throttle > 100) {
 								controlValue.Throttle = 100;
@@ -149,7 +167,7 @@ function OMVC() {
 						}
 						break;
 					case "button1":
-						if (count == 1) {
+						if (enabled) {
 							controlValue.Throttle--;
 							if (controlValue.Throttle < 0) {
 								controlValue.Throttle = 0;
@@ -173,37 +191,55 @@ function OMVC() {
 						return;
 						break;
 					case "dpadRight":
-						if (count == 1) {
+						if (enabled) {
 							x++;
 						}
 						break;
 					case "dpadLeft":
-						if (count == 1) {
+						if (enabled) {
 							x--;
 						}
 						break;
 					case "dpadUp":
-						if (count == 1) {
+						if (enabled) {
 							y++;
 						}
 						break;
 					case "dpadDown":
-						if (count == 1) {
+						if (enabled) {
 							y--;
 						}
 						break;
 					case "rightBumper":
-						if (count == 1) {
+						if (enabled) {
 							z++;
 						}
 						break;
 					case "leftBumper":
-						if (count == 1) {
+						if (enabled) {
 							z--;
 						}
 						break;
+					case "leftJoystickX":
+						controlValue.Pitch = value * 45;
+						self.setControlValue(controlValue);
+						return;
+						break;
+					case "leftJoystickY":
+						controlValue.Roll = -value * 45;
+						self.setControlValue(controlValue);
+						return;
+						break;
+					case "rightJoystickX":
+						if (enabled) {
+						}
+						break;
+					case "rightJoystickY":
+						if (enabled) {
+						}
+						break;
 					default:
-						console.log(key);
+						//console.log("key : " + key + ", value : " + value);
 						return;
 					}
 					var bln = self.incrementControlValue(x, y, z);
@@ -295,21 +331,27 @@ function OMVC() {
 
 		incrementControlValue : function(x, y, z) {
 			if (!command_processing) {
-				command_processing = true;
 				if (socket == null) {
 					return false;
 				}
+				command_processing = true;
 
 				if (operationMode == OperationModeEnum.Drive) {
-//					var quat_correct = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(x), THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
-//					var quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll), THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
-//							.degToRad(vehicleAttitude.Yaw), "ZYX"));
-//					quaternion.multiply(quat_correct);
-//					var euler = new THREE.Euler().setFromQuaternion(quaternion, "ZYX");
-//					controlValue.Roll = THREE.Math.radToDeg(euler.x);
-//					controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
-//					controlValue.Yaw = THREE.Math.radToDeg(euler.z);
-					
+					// var quat_correct = new
+					// THREE.Quaternion().setFromEuler(new
+					// THREE.Euler(THREE.Math.degToRad(x),
+					// THREE.Math.degToRad(y), THREE.Math.degToRad(z), "ZYX"));
+					// var quaternion = new THREE.Quaternion().setFromEuler(new
+					// THREE.Euler(THREE.Math.degToRad(vehicleAttitude.Roll),
+					// THREE.Math.degToRad(-vehicleAttitude.Pitch), THREE.Math
+					// .degToRad(vehicleAttitude.Yaw), "ZYX"));
+					// quaternion.multiply(quat_correct);
+					// var euler = new
+					// THREE.Euler().setFromQuaternion(quaternion, "ZYX");
+					// controlValue.Roll = THREE.Math.radToDeg(euler.x);
+					// controlValue.Pitch = THREE.Math.radToDeg(-euler.y);
+					// controlValue.Yaw = THREE.Math.radToDeg(euler.z);
+
 					function validateDeg(value) {
 						if (value > 180) {
 							value -= 360;
@@ -344,6 +386,32 @@ function OMVC() {
 					if (command_processing) {
 						command_processing = false;
 					}
+				}, 5000);
+
+				return true;
+			}
+			return false;
+		},
+
+		setControlValue : function(value) {
+			if (!command_processing) {
+				if (socket == null) {
+					return false;
+				}
+				var isDone = false;
+				command_processing = true;
+
+				controlValue = value;
+
+				socket.emit('setControlValue', controlValue, function(obj) {
+					isDone = true;
+					command_processing = false;
+				});
+				setTimeout(function() {
+					if (isDone) {
+						return;
+					}
+					command_processing = false;
 				}, 5000);
 
 				return true;

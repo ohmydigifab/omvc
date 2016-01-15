@@ -156,7 +156,7 @@ function OMGAMEPAD() {
 									} else {
 										gamepadStateCount[key] = 0;
 									}
-									if (newState[key] != gamepadState[key]) {
+									if (newState[key] != 0 || gamepadState[key] != 0) {
 										if (self.gamepadCallback) {
 											self.gamepadCallback(key, newState[key], gamepadStateCount[key]);
 										}
