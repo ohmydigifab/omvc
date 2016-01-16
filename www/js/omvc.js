@@ -154,7 +154,7 @@ function OMVC() {
 				var x = 0, y = 0, z = 0;
 				omgamepad.gamepadCallback = function(key, value, count) {
 					var enabled = (count == 1);
-					if (count > 20 && (count % 5) == 0) {
+					if (count > 8 && (count % 2) == 0) {
 						enabled = true;
 					}
 					switch (key) {
@@ -493,7 +493,7 @@ function OMVC() {
 				self.omvr.setVehicleAttitude({
 					Roll : 0,
 					Pitch : 0,
-					Yaw : 0
+					Yaw : 180
 				});
 				break;
 			case OperationModeEnum.Dive:
