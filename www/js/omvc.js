@@ -110,7 +110,7 @@ function OMVC() {
 				Pitch : 0,
 				Yaw : 0
 			});
-			self.omvr.addFisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.17:9000/?action=snapshot', false, true, function() {
+			self.omvr.addFisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.2:9000/?action=snapshot', false, true, function() {
 			}, {
 				Roll : 180,
 				Pitch : 0,
@@ -126,7 +126,7 @@ function OMVC() {
 					setInterval(function() {
 						var _starttime = new Date();
 						console.log('ping!!');
-						socket.emit('ping', _starttime);
+						socket.emit('ping');
 					}, 1000);
 				});
 				socket.on('pong', function(obj) {
