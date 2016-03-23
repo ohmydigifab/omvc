@@ -58,6 +58,8 @@ function OMVC() {
 	var operationMode = OperationModeEnum.Hobby;
 
 	var command_processing = false;
+	
+	var ledValue = 0;
 
 	var self = {
 		omvr : new OMVR(),
@@ -81,10 +83,11 @@ function OMVC() {
 			document.getElementById("actuatorMsg").appendChild(actuatorMsgNode);
 			document.getElementById("attitudeMsg").appendChild(attitudeMsgNode);
 
+			var num = Math.floor(Math.random() * 3);
 			var requestAttitude = false;
 			var canvas = document.getElementById('vrCanvas');
 			self.omvr.init(canvas);
-			self.omvr.addFisheyeCamera('img/default_image_0.jpeg', 'http://192.168.42.1:9000/?action=snapshot', true, false, function() {
+			self.omvr.setTexture('img/demo_image_' + num + '.jpeg', 'http://192.168.40.2:9001/vr.jpeg?cache=no', true, false, function() {
 				if (socket == null) {
 					return;
 				}
@@ -106,21 +109,15 @@ function OMVC() {
 					}, 2000);
 				}
 			}, {
-				Roll : 0,
+				Roll : 90,
 				Pitch : 0,
-				Yaw : 0
-			});
-			self.omvr.addFisheyeCamera('img/default_image_1.jpeg', 'http://192.168.42.2:9000/?action=snapshot', false, true, function() {
-			}, {
-				Roll : 180,
-				Pitch : 0,
-				Yaw : -90
+				Yaw : 90
 			});
 		},
 
 		initSocket : function() {
-			jQuery.getScript("http://192.168.42.1:9001/socket.io/socket.io.js", function() {
-				socket = io.connect('http://192.168.42.1:9001');
+			jQuery.getScript("http://192.168.40.2:9001/socket.io/socket.io.js", function() {
+				socket = io.connect('http://192.168.40.2:9001');
 				// サーバから受け取るイベント
 				socket.on('connect', function() {
 					setInterval(function() {
@@ -239,7 +236,7 @@ function OMVC() {
 						}
 						break;
 					default:
-						//console.log("key : " + key + ", value : " + value);
+						// console.log("key : " + key + ", value : " + value);
 						return;
 					}
 					var bln = self.incrementControlValue(x, y, z);
@@ -256,6 +253,26 @@ function OMVC() {
 				var count = 1;
 				var key = String.fromCharCode(e.keyCode);
 				switch (key) {
+				case "1":
+					if (count == 1) {
+						ledValue--;
+						if(ledValue < 0) {
+							ledValue = 0;
+						}
+						socket.emit('setUpperLedValue', ledValue);
+						socket.emit('setBottomLedValue', ledValue);
+					}
+					break;
+				case "2":
+					if (count == 1) {
+						ledValue++;
+						if(ledValue > 100) {
+							ledValue = 100;
+						}
+						socket.emit('setUpperLedValue', ledValue);
+						socket.emit('setBottomLedValue', ledValue);
+					}
+					break;
 				case "H":
 					if (count == 1) {
 						controlValue.Throttle++;
