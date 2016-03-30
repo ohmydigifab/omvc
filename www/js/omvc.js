@@ -217,6 +217,26 @@ function OMVC() {
 							z--;
 						}
 						break;
+					case "leftTrigger":
+						if (enabled) {
+							ledValue--;
+							if(ledValue < 0) {
+								ledValue = 0;
+							}
+							socket.emit('setUpperLedValue', ledValue);
+							socket.emit('setBottomLedValue', ledValue);
+						}
+						break;
+					case "rightTrigger":
+						if (enabled) {
+							ledValue++;
+							if(ledValue > 100) {
+								ledValue = 100;
+							}
+							socket.emit('setUpperLedValue', ledValue);
+							socket.emit('setBottomLedValue', ledValue);
+						}
+						break;
 					case "leftJoystickX":
 						controlValue.Pitch = value * 45;
 						self.setControlValue(controlValue);
@@ -236,7 +256,7 @@ function OMVC() {
 						}
 						break;
 					default:
-						// console.log("key : " + key + ", value : " + value);
+						console.log("key : " + key + ", value : " + value);
 						return;
 					}
 					var bln = self.incrementControlValue(x, y, z);
