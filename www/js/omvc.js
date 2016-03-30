@@ -50,6 +50,7 @@ function OMVC() {
 	document.getElementById("actuatorMsgBox").style.display = "none";
 	document.getElementById("attitudeMsgBox").style.display = "none";
 
+	var fpsMsgNode = document.createTextNode("");
 	var controlMsgNode = document.createTextNode("");
 	var debugMsgNode = document.createTextNode("");
 	var actuatorMsgNode = document.createTextNode("");
@@ -78,6 +79,7 @@ function OMVC() {
 
 		initOmvr : function() {
 			// Add those text nodes where they need to go
+			document.getElementById("fpsMsg").appendChild(fpsMsgNode);
 			document.getElementById("controlMsg").appendChild(controlMsgNode);
 			document.getElementById("debugMsg").appendChild(debugMsgNode);
 			document.getElementById("actuatorMsg").appendChild(actuatorMsgNode);
@@ -87,28 +89,7 @@ function OMVC() {
 			var requestAttitude = false;
 			var canvas = document.getElementById('vrCanvas');
 			self.omvr.init(canvas);
-			self.omvr.setTexture('img/demo_image_' + num + '.jpeg', 'http://192.168.40.2:9001/vr.jpeg?cache=no', true, false, function() {
-				if (socket == null) {
-					return;
-				}
-				if (!requestAttitude) {
-					requestAttitude = true;
-					var isDone = false;
-					socket.emit('getAttitude', function(obj) {
-						// console.log(obj);
-						isDone = true;
-						requestAttitude = false;
-						self.setVehicleAttitude(obj);
-					});
-					setTimeout(function() {
-						if (isDone) {
-							return;
-						}
-						console.log("timeout of requestAttitude");
-						requestAttitude = false;
-					}, 2000);
-				}
-			}, {
+			self.omvr.setTexture('img/demo_image_' + num + '.jpeg', 'http://192.168.40.2:9001/vr.jpeg?cache=no', true, false, null, {
 				Roll : 90,
 				Pitch : 0,
 				Yaw : 90
@@ -543,6 +524,7 @@ function OMVC() {
 			self.omvr.animate();
 
 			{// status
+				fpsMsgNode.nodeValue = self.omvr.fps.toFixed(0) + "fps";
 				controlMsgNode.nodeValue = controlValue.Throttle.toFixed(0) + "%" + " " + controlValue.Roll + " " + controlValue.Pitch + " " + controlValue.Yaw;
 				actuatorMsgNode.nodeValue = actuatorValue.LeftTop.toFixed(0) + " " + actuatorValue.RightTop + " " + actuatorValue.RightBottom + " " + actuatorValue.LeftBottom;
 				debugMsgNode.nodeValue = debug_msg;
