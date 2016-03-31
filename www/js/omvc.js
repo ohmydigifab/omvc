@@ -524,7 +524,7 @@ function OMVC() {
 			self.omvr.animate();
 
 			{// status
-				fpsMsgNode.nodeValue = self.omvr.fps.toFixed(0) + "fps";
+				fpsMsgNode.nodeValue = self.omvr.fps.toFixed(1) + "fps";
 				controlMsgNode.nodeValue = controlValue.Throttle.toFixed(0) + "%" + " " + controlValue.Roll + " " + controlValue.Pitch + " " + controlValue.Yaw;
 				actuatorMsgNode.nodeValue = actuatorValue.LeftTop.toFixed(0) + " " + actuatorValue.RightTop + " " + actuatorValue.RightBottom + " " + actuatorValue.LeftBottom;
 				debugMsgNode.nodeValue = debug_msg;
