@@ -59,8 +59,10 @@ function OMVC() {
 	var operationMode = OperationModeEnum.Hobby;
 
 	var command_processing = false;
-	
+
 	var ledValue = 0;
+
+	var recording = false;
 
 	var self = {
 		omvr : new OMVR(),
@@ -130,7 +132,7 @@ function OMVC() {
 		initGamepadEventLisener : function() {
 			if (omgamepad) {
 				var x = 0, y = 0, z = 0;
-				omgamepad.gamepadCallback = function(key, value, count) {
+				omgamepad.gamepadCallback = function(key, value, count, states) {
 					var enabled = (count == 1);
 					if (count > 8 && (count % 2) == 0) {
 						enabled = true;
@@ -188,20 +190,37 @@ function OMVC() {
 							y--;
 						}
 						break;
-					case "rightBumper":
-						if (enabled) {
-							z++;
-						}
-						break;
 					case "leftBumper":
 						if (enabled) {
-							z--;
+						}
+						break;
+					case "rightBumper":
+						if (count == 1) {
+							console.log(states['button3']);
+							if (states['button3'] > 0.0) {// Y button being
+															// pushed , record
+															// mode
+								if (recording) {
+									console.log("stopRecord!");
+									socket.emit('stopRecord', function() {
+										window.plugins.saveImage.saveVideoFromURL('http://192.168.40.2:9001/vr.mp4', null);
+									});
+									recording = false;
+								} else {
+									console.log("startRecord!");
+									socket.emit('startRecord');
+									recording = true;
+								}
+							} else {
+								console.log("snap!");
+								window.plugins.saveImage.saveImageFromURL('http://192.168.40.2:9001/vr.jpeg', null);
+							}
 						}
 						break;
 					case "leftTrigger":
 						if (enabled) {
 							ledValue--;
-							if(ledValue < 0) {
+							if (ledValue < 0) {
 								ledValue = 0;
 							}
 							socket.emit('setUpperLedValue', ledValue);
@@ -211,7 +230,7 @@ function OMVC() {
 					case "rightTrigger":
 						if (enabled) {
 							ledValue++;
-							if(ledValue > 100) {
+							if (ledValue > 100) {
 								ledValue = 100;
 							}
 							socket.emit('setUpperLedValue', ledValue);
@@ -257,7 +276,7 @@ function OMVC() {
 				case "1":
 					if (count == 1) {
 						ledValue--;
-						if(ledValue < 0) {
+						if (ledValue < 0) {
 							ledValue = 0;
 						}
 						socket.emit('setUpperLedValue', ledValue);
@@ -267,11 +286,21 @@ function OMVC() {
 				case "2":
 					if (count == 1) {
 						ledValue++;
-						if(ledValue > 100) {
+						if (ledValue > 100) {
 							ledValue = 100;
 						}
 						socket.emit('setUpperLedValue', ledValue);
 						socket.emit('setBottomLedValue', ledValue);
+					}
+					break;
+				case "3":
+					if (count == 1) {
+						socket.emit('startRecord');
+					}
+					break;
+				case "4":
+					if (count == 1) {
+						socket.emit('stopRecord');
 					}
 					break;
 				case "H":

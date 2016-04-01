@@ -35,6 +35,9 @@
         },
         "org.apache.cordova.device-orientation": {
             "PACKAGE_NAME": "com.ohmydigifab.openrovcardboardviewer"
+        },
+        "com.contentecontent.cordova.plugins.saveImage": {
+            "PACKAGE_NAME": "com.ohmydigifab.omvc"
         }
     },
     "dependent_plugins": {}

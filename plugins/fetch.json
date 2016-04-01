@@ -35,5 +35,11 @@
             "url": "https://github.com/bdi/com-idoctum-deviceattitude.git",
             "subdir": "."
         }
+    },
+    "com.contentecontent.cordova.plugins.saveImage": {
+        "source": {
+            "type": "local",
+            "path": "/Users/takuma/github/SaveImageFromURL"
+        }
     }
 }
