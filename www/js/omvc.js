@@ -196,7 +196,6 @@ function OMVC() {
 						break;
 					case "rightBumper":
 						if (count == 1) {
-							console.log(states['button3']);
 							if (states['button3'] > 0.0) {// Y button being
 															// pushed , record
 															// mode
