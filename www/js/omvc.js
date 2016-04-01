@@ -200,19 +200,20 @@ function OMVC() {
 															// pushed , record
 															// mode
 								if (recording) {
-									console.log("stopRecord!");
+									console.log("stop record!");
 									socket.emit('stopRecord', function() {
-										window.plugins.saveImage.saveVideoFromURL('http://192.168.40.2:9001/vr.mp4', null);
+										console.log("save video!");
+										window.plugins.saveImage.saveVideoFromURL('http://192.168.40.2:9001/vr.mp4?cache=no', null);
 									});
 									recording = false;
 								} else {
-									console.log("startRecord!");
+									console.log("start record!");
 									socket.emit('startRecord');
 									recording = true;
 								}
 							} else {
 								console.log("snap!");
-								window.plugins.saveImage.saveImageFromURL('http://192.168.40.2:9001/vr.jpeg', null);
+								window.plugins.saveImage.saveImageFromURL('http://192.168.40.2:9001/vr.jpeg?cache=no', null);
 							}
 						}
 						break;
