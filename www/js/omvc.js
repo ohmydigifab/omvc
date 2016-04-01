@@ -197,13 +197,14 @@ function OMVC() {
 					case "rightBumper":
 						if (count == 1) {
 							if (states['button3'] > 0.0) {// Y button being
-															// pushed , record
-															// mode
+								// pushed , record
+								// mode
 								if (recording) {
 									console.log("stop record!");
+									var filename = moment().format('YYYYMMDD_hhmmss') + '.mp4';
 									socket.emit('stopRecord', function() {
-										console.log("save video!");
-										window.plugins.saveImage.saveVideoFromURL('http://192.168.40.2:9001/vr.mp4?cache=no', null);
+										console.log("save video!: " + filename);
+										window.plugins.saveImage.saveVideoFromURL('http://192.168.40.2:9001/' + filename + '?cache=no', null);
 									});
 									recording = false;
 								} else {
